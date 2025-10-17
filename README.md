@@ -101,7 +101,7 @@ Backend runs at http://localhost:5000
 
 ---
 
-⚙️ Recommended npm Scripts
+### ⚙️ Recommended npm Scripts
 
 ---
 
@@ -127,7 +127,7 @@ frontend/package.json
 
 ---
 
-✅ Deployment Notes
+###✅ Deployment Notes
 
 Run npm run build in the frontend to generate production assets.
 
