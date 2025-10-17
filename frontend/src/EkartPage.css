@@ -1,0 +1,74 @@
+/* --- FINAL, GUARANTEED & CORRECTED EKART PAGE STYLES --- */
+.feature-ekart-page {
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    /* --- THIS IS THE GUARANTEED FIX (STEP 3) --- */
+    /* The background-image is now handled by the JS file. */
+    /* These lines ensure it is displayed correctly. */
+    background-color: #0a0a0a; /* Fallback color */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.ekart-header {
+    height: 35vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.ekart-header h1 {
+    font-size: 5rem;
+    font-weight: 900;
+    color: orange;
+    margin: 0;
+    text-shadow: 0 0 25px rgba(255,165,0,0.4);
+}
+
+.ekart-header p {
+    font-size: 1.5rem;
+    color: #ccc;
+    max-width: 600px;
+    margin-top: 20px;
+}
+
+.product-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 50px;
+    min-height: 90vh;
+    padding: 80px 5%;
+    border-bottom: 1px solid #222;
+}
+
+.product-showcase:nth-child(even) { direction: rtl; }
+.product-showcase:nth-child(even) > * { direction: ltr; }
+.showcase-image {
+    height: 70vh;
+    background-color: #111;
+    border-radius: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.showcase-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+    transition: transform 0.4s ease;
+}
+.showcase-image:hover img { transform: scale(1.05); }
+.showcase-details { padding: 20px; }
+.showcase-details h2 { font-size: 4.5rem; font-weight: 900; color: orange; line-height: 1.1; margin: 0; }
+.showcase-details .price { font-size: 2.5rem; font-weight: 300; color: white; margin: 20px 0; }
+.showcase-details .desc { font-size: 1.1rem; color: #ccc; line-height: 1.8; max-width: 500px; margin-bottom: 40px; }
+.buy-button { background: orange; color: black; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: 700; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: transform 0.2s ease; }
+.buy-button:hover { transform: scale(1.05); }

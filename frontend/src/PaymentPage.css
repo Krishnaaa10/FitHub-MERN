@@ -1,0 +1,108 @@
+/* --- NEW & IMPROVED PROFESSIONAL PAYMENT PAGE STYLES --- */
+.payment-page {
+    font-family: 'Poppins', sans-serif;
+    background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1526401485004-469102124235');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    min-height: 100vh;
+}
+
+.payment-container form {
+    padding: 40px; /* Increased padding */
+    width: 100%;
+    max-width: 800px; /* Made the form slightly wider */
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    border: 2px solid orange;
+    border-radius: 20px;
+}
+
+.payment-container form .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px; /* Increased gap */
+}
+
+.payment-container form .row .col {
+    flex: 1 1 300px; /* Adjusted flex-basis */
+}
+
+.payment-container form .row .col .title {
+    font-size: 22px;
+    color: orange;
+    padding-bottom: 10px;
+    margin-bottom: 10px; /* Added margin */
+    text-transform: uppercase;
+    border-bottom: 1px solid #444; /* Added separator */
+}
+
+.payment-container form .row .col .inputBox {
+    margin: 15px 0;
+}
+
+.payment-container form .row .col .inputBox span {
+    margin-bottom: 10px;
+    display: block;
+    color: #ccc;
+    font-weight: 500; /* Medium weight for labels */
+}
+
+.payment-container form .row .col .inputBox input {
+    width: 100%;
+    border: 1px solid #444;
+    background: #222;
+    padding: 14px 15px; /* Increased padding */
+    font-size: 16px; /* Larger font */
+    text-transform: none;
+    color: white;
+    border-radius: 8px; /* More rounded corners */
+    transition: border-color 0.3s ease; /* Smooth transition */
+}
+
+.payment-container form .row .col .inputBox input::placeholder {
+    color: #666; /* Lighter placeholder text */
+}
+
+.payment-container form .row .col .inputBox input:focus {
+    border-color: orange;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.3); /* Glow effect on focus */
+}
+
+.payment-container form .row .col .flex {
+    display: flex;
+    gap: 20px;
+}
+
+.payment-container form .row .col .inputBox img {
+    height: 34px;
+    margin-top: 5px;
+    filter: brightness(0) invert(1);
+    opacity: 0.8; /* Slightly transparent */
+}
+
+.payment-container form .submit-btn {
+    width: 100%;
+    padding: 18px; /* Taller button */
+    font-size: 20px; /* Larger text */
+    font-weight: 700;
+    background: orange;
+    color: #000;
+    margin-top: 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.payment-container form .submit-btn:hover {
+    background: white;
+    color: orange;
+    transform: scale(1.02); /* Subtle grow effect */
+    box-shadow: 0 5px 20px rgba(255, 165, 0, 0.3);
+}

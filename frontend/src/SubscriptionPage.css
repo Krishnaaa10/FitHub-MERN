@@ -1,0 +1,82 @@
+/* --- PROFESSIONAL SUBSCRIPTION PAGE STYLES --- */
+.subscription-page {
+    font-family: 'Poppins', sans-serif;
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    padding: 50px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.subscription-header {
+    font-size: 5rem;
+    font-weight: 900;
+    color: orange;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.membership-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+}
+
+.membership-card {
+    background-color: rgba(20, 20, 20, 0.8);
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.membership-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(255, 165, 0, 0.2);
+}
+
+.membership-card h4 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.membership-card h2 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: orange;
+    margin: 10px 0;
+}
+.membership-card h2 sup { font-size: 2rem; }
+.membership-card h3 { font-size: 1rem; color: #888; margin-bottom: 30px; font-weight: 400;}
+.membership-card p { margin-bottom: 15px; color: #ddd; }
+
+.membership-btn {
+    background: orange;
+    color: black;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.2s ease;
+}
+.membership-btn:hover { transform: scale(1.05); }
+.membership-btn a { color: black !important; text-decoration: none !important; }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .membership-grid { grid-template-columns: 1fr; }
+}

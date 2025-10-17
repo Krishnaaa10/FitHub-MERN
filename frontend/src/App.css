@@ -1,0 +1,7 @@
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  line-height: 1.6;
+  /* We remove the background and color from here */
+}
