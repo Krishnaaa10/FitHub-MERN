@@ -81,18 +81,21 @@ git clone https://github.com/YOUR_USERNAME/fithub-mern.git
 cd fithub-mern
 
 ---
+
 Backend:
 cd backend
 npm install
 npm run dev
 
 ---
+
 Frontend:
 cd ../frontend
 npm install
 npm start
 
 ---
+
 Frontend runs at http://localhost:3000
 Backend runs at http://localhost:5000
 
@@ -101,6 +104,7 @@ Backend runs at http://localhost:5000
 ⚙️ Recommended npm Scripts
 
 ---
+
 backend/package.json
 
 {
@@ -111,6 +115,7 @@ backend/package.json
 }
 
 ---
+
 frontend/package.json
 
 {
@@ -121,6 +126,7 @@ frontend/package.json
 }
 
 ---
+
 ✅ Deployment Notes
 
 Run npm run build in the frontend to generate production assets.
@@ -132,6 +138,7 @@ Use environment variables securely (never commit .env).
 Enable HTTPS and proper CORS configuration.
 
 ---
+
 🎨 Design Philosophy
 
 Dark theme for a modern, athletic aesthetic.
@@ -145,12 +152,14 @@ Modal-based video playback.
 Responsive and accessible (keyboard + screen reader friendly).
 
 ---
+
 🧾 License
 
 Licensed under the MIT License
 .
 
 ---
+
 💬 Motto
 
 "Hustle for that Muscle."
