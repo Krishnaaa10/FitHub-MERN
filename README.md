@@ -76,7 +76,7 @@ Optional: STRIPE_SECRET_KEY=sk_test_...
 ---
 
 ### 2️⃣ Installation (Manual)
-```bash
+
 git clone https://github.com/YOUR_USERNAME/fithub-mern.git
 cd fithub-mern
 
