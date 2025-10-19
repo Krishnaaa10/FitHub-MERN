@@ -16,7 +16,9 @@ const ContactPage = () => {
         setFormStatus('Sending...');
 
         try {
-            await axios.post('/api/contact', formData);
+            // --- THIS IS THE CORRECTED LINE ---
+            await axios.post('https://fithub-mern-2.onrender.com/api/contact', formData); 
+            
             setFormStatus('Message Sent Successfully!');
             setFormData({ name: '', email: '', message: '' });
         } catch (err) {

@@ -1,6 +1,6 @@
 // Main server entry point for the backend
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // Import cors at the top
 const connectToMongoDatabase = require('./config/db');
 require('dotenv').config();
 
@@ -11,30 +11,25 @@ const shreeApp = express();
 connectToMongoDatabase();
 
 // --- Middlewares ---
-// Enable Cross-Origin Resource Sharing
-shreeApp.use(cors());
-// Enable express to parse JSON in request bodies
+
+// 1. Enable Cross-Origin Resource Sharing (CORS)
+// This allows your frontend to make requests to your backend
+shreeApp.use(cors({
+  origin: "https://fithub-mern-3.onrender.com" // <-- IMPORTANT: Your FRONTEND URL goes here
+}));
+
+// 2. Enable express to parse JSON in request bodies
 shreeApp.use(express.json({ extended: false }));
 
-// backend/server.js
-
-// ... (keep all the existing code at the top)
-
 // --- API Routes ---
+// Simple test route
 shreeApp.get('/', (req, res) => res.send('FitHub API is up and running!'));
+
+// Main API routes
 shreeApp.use('/api/users', require('./routes/api/users'));
 shreeApp.use('/api/exercises', require('./routes/api/exercises'));
-
-// --- ADD THIS NEW LINE ---
 shreeApp.use('/api/contact', require('./routes/api/contact'));
-
-// ... (keep all the existing code at the bottom)
-
-// --- API Routes ---
-shreeApp.get('/', (req, res) => res.send('FitHub API is up and running!'));
-shreeApp.use('/api/users', require('./routes/api/users'));
-shreeApp.use('/api/exercises', require('./routes/api/exercises'));
-
+// (Add any other routes like ekart, subscriptions, etc., here)
 
 // Define the port to listen on
 const PORT = process.env.PORT || 5000;
