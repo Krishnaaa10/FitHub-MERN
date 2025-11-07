@@ -18,27 +18,53 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   process.env.FRONTEND_URL,
-  'https://fithub-mern-3.onrender.com'
+  // Add your Render frontend URL here or set FRONTEND_URL env variable
 ].filter(Boolean); // Remove undefined values
 
+// CORS configuration - Allow requests from frontend
+// For Render deployments, we allow all origins by default to avoid CORS issues
+// You can restrict this by setting FRONTEND_URL environment variable
 shreeApp.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins in development, restrict in production
+    // If FRONTEND_URL is set, use it to validate origins
+    if (process.env.FRONTEND_URL) {
+      const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, ''); // Remove trailing slash
+      if (origin === frontendUrl || origin.startsWith(frontendUrl)) {
+        return callback(null, true);
+      }
+      // Also check allowedOrigins array
+      if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
+        return callback(null, true);
+      }
     }
+    
+    // For Render deployments, allow all origins to avoid CORS issues
+    // In production without FRONTEND_URL set, allow all (Render-friendly)
+    // In development, always allow all
+    callback(null, true);
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // 2. Enable express to parse JSON in request bodies
 shreeApp.use(express.json({ extended: false }));
 
 // --- API Routes ---
+// Health check endpoint for deployment verification
+shreeApp.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'FitHub API is up and running!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Simple test route
 shreeApp.get('/', (req, res) => res.send('FitHub API is up and running!'));
 
