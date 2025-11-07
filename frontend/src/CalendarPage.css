@@ -1,11 +1,11 @@
 /* --- UPGRADED PROFESSIONAL & AESTHETIC CALENDAR PAGE STYLES --- */
 .calendar-page {
     font-family: 'Poppins', sans-serif;
-    /* --- NEW RELIABLE BACKGROUND IMAGE --- */
-    background-image: linear-gradient(rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.9)), url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e');
+    background-image: linear-gradient(135deg, rgba(10, 10, 10, 0.90) 0%, rgba(20, 20, 20, 0.87) 100%), url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Keeps the background static on scroll */
+    background-attachment: scroll; /* Optimized for performance */
+    background-repeat: no-repeat;
     color: white;
     min-height: 100vh;
     padding: 40px;
@@ -13,6 +13,7 @@
     justify-content: center;
     align-items: flex-start;
     gap: 40px;
+    position: relative;
 }
 
 .calendar-container {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import '../VideoPage.css';
 
 // --- FINAL, TRIPLE-CHECKED & WORKING YOUTUBE LINKS ---
@@ -16,7 +16,23 @@ const shreeExercises = [
 ];
 
 const VideoPage = () => {
+    const [searchParams] = useSearchParams();
     const [selectedVideo, setSelectedVideo] = useState(null);
+
+    useEffect(() => {
+        // Check if videoId is in URL params
+        const videoId = searchParams.get('videoId');
+        const exerciseName = searchParams.get('exercise');
+        
+        if (videoId) {
+            // Find the exercise by videoId
+            const exercise = shreeExercises.find(ex => ex.videoId === videoId);
+            if (exercise) {
+                // Auto-select and play the video
+                setSelectedVideo(exercise);
+            }
+        }
+    }, [searchParams]);
 
     return (
         <div className="exercise-page">

@@ -1,39 +1,62 @@
-import React, { useState } from 'react';
-import '../CalendarPage.css'; // Import the upgraded CSS
+import React, { useState, useEffect } from 'react';
+import api from '../utils/api';
+import '../CalendarPage.css';
 
 const CalendarPage = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
-    // State for the text in the new log input field
     const [newLog, setNewLog] = useState('');
-    // We now need setWorkoutLogs to add new entries
-    const [workoutLogs, setWorkoutLogs] = useState({
-        '2025-10-05': ['Chest Press - 4 sets', 'Incline Dumbbell Fly - 3 sets'],
-        '2025-10-08': ['Barbell Squats - 5 sets', 'Leg Press - 4 sets', 'Calf Raises - 4 sets'],
-        '2025-10-12': ['5km Run - 30 minutes'],
-        '2025-10-17': ['Deadlifts - 5 sets', 'Pull-ups - 4 sets'],
-        '2025-11-02': ['Overhead Press - 4 sets', 'Lateral Raises - 3 sets'],
-    });
+    const [workoutLogs, setWorkoutLogs] = useState({});
+    const [loading, setLoading] = useState(true);
 
-    // --- Function to handle adding a new log ---
-    const handleAddLog = (e) => {
-        e.preventDefault(); // Prevent page refresh
-        if (!newLog.trim() || !selectedDate) return; // Do nothing if input is empty
+    // Load workout logs from backend on component mount
+    useEffect(() => {
+        const fetchWorkoutLogs = async () => {
+            try {
+                const res = await api.get('/workouts');
+                setWorkoutLogs(res.data);
+            } catch (err) {
+                console.error('Error fetching workout logs:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchWorkoutLogs();
+    }, []);
 
-        const dateString = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+    // Function to handle adding a new log
+    const handleAddLog = async (e) => {
+        e.preventDefault();
+        if (!newLog.trim() || !selectedDate) return;
+
+        const dateString = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
         
-        // Get existing logs for the selected day, or an empty array if none exist
         const existingLogs = workoutLogs[dateString] || [];
-        // Create the new list of logs
         const updatedLogs = [...existingLogs, newLog];
 
-        // Update the main workoutLogs state
+        // Optimistically update UI
         setWorkoutLogs({
             ...workoutLogs,
             [dateString]: updatedLogs
         });
         
-        setNewLog(''); // Clear the input field
+        setNewLog('');
+
+        // Save to backend
+        try {
+            await api.post('/workouts', {
+                date: dateString,
+                logs: updatedLogs
+            });
+        } catch (err) {
+            console.error('Error saving workout log:', err);
+            // Revert on error
+            setWorkoutLogs({
+                ...workoutLogs,
+                [dateString]: existingLogs
+            });
+            alert('Failed to save workout log. Please try again.');
+        }
     };
 
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -51,7 +74,7 @@ const CalendarPage = () => {
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
-            const dateString = `${year}-${month + 1}-${String(day).padStart(2, '0')}`;
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             calendarDays.push({
                 key: dateString, day, date,
                 isToday: date.toDateString() === new Date().toDateString(),
@@ -68,16 +91,28 @@ const CalendarPage = () => {
         }
     };
 
-    const selectedDateString = selectedDate ? `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${String(selectedDate.getDate()).padStart(2, '0')}` : null;
+    const handleMonthChange = (direction) => {
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setMonth(prev.getMonth() + direction);
+            return newDate;
+        });
+    };
+
+    const selectedDateString = selectedDate ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}` : null;
     const logsForSelectedDate = selectedDateString ? workoutLogs[selectedDateString] : null;
+
+    if (loading) {
+        return <div className="calendar-page"><div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div></div>;
+    }
 
     return (
         <div className="calendar-page">
             <div className="calendar-container">
                 <div className="calendar-header">
-                    <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}>‹</button>
+                    <button onClick={() => handleMonthChange(-1)}>‹</button>
                     <h2>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
-                    <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>›</button>
+                    <button onClick={() => handleMonthChange(1)}>›</button>
                 </div>
                 <div className="calendar-grid">
                     {daysOfWeek.map(day => <div key={day} className="day-name">{day}</div>)}
@@ -102,7 +137,7 @@ const CalendarPage = () => {
                     <p className="no-log-message">No workout logged for this day.</p>
                 )}
 
-                {/* --- NEW FORM TO ADD WORKOUT LOGS --- */}
+                {/* Form to add workout logs */}
                 <form className="add-log-form" onSubmit={handleAddLog}>
                     <input
                         type="text"
