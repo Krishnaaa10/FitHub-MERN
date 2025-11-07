@@ -1,4 +1,4 @@
-<img width="1920" height="1080" alt="Screenshot (73)" src="https://github.com/user-attachments/assets/059f0c02-9f74-4f22-8d81-8ea7b7a468f1" /># 💪 FitHub — Your Ultimate Fitness Oasis
+💪 FitHub — Your Ultimate Fitness Oasis
 
 > A full-stack, modern, and high-performance fitness application designed to provide a seamless and immersive user experience. From tracking workouts to managing subscriptions and shopping for supplements — **FitHub** is your all-in-one digital fitness hub.
 
