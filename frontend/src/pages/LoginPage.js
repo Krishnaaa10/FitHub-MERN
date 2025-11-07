@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../utils/api';
+import { setAuthToken, setUser } from '../utils/auth';
 import '../AuthForm.css';
 
 const LoginPage = () => {
@@ -7,23 +9,45 @@ const LoginPage = () => {
     email: '',
     password: '',
   });
-  const navigate = useNavigate(); // Initialize the navigate function
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { email, password } = formData;
 
   const onInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(''); // Clear error on input change
   };
 
-  const onFormSubmit = (e) => {
+  const onFormSubmit = async (e) => {
     e.preventDefault();
-    // --- THIS IS THE NEW LOGIC ---
-    // Later, we will send this to the backend to verify.
-    // For now, we assume the login is always successful.
-    console.log('Login successful with:', formData);
+    setError('');
+    setLoading(true);
 
-    // Redirect the user to the homepage after successful login
-    navigate('/home');
+    try {
+      const res = await api.post('/users/login', formData);
+      
+      // Save token and user data
+      setAuthToken(res.data.token);
+      setUser(res.data.user);
+      
+      // Redirect to home page
+      navigate('/home');
+    } catch (err) {
+      console.error('Login error:', err);
+      if (err.code === 'ECONNREFUSED' || err.message === 'Network Error') {
+        setError('Cannot connect to server. Please make sure the backend server is running.');
+      } else if (err.response?.data?.msg) {
+        setError(err.response.data.msg);
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else {
+        setError(err.message || 'Login failed. Please check your credentials.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,6 +55,7 @@ const LoginPage = () => {
       <div className="wrapper">
         <form onSubmit={onFormSubmit}>
           <h1>Login</h1>
+          {error && <div className="error-message">{error}</div>}
           <div className="input-box">
             <input
               type="email"
@@ -53,8 +78,8 @@ const LoginPage = () => {
             />
             <i className='bx bxs-lock-alt'></i>
           </div>
-          <button type="submit" className="btn">
-            Login
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
           </button>
           <div className="register-link">
             <p>

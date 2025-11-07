@@ -1,30 +1,54 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../AuthForm.css'; // Import the new CSS
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../utils/api';
+import { setAuthToken, setUser } from '../utils/auth';
+import '../AuthForm.css';
 
 const RegisterPage = () => {
-  // Use React state to manage form inputs
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Destructure for easier access
   const { name, email, password } = formData;
 
-  // A single function to handle all input changes
   const onInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(''); // Clear error on input change
   };
 
-  // Function to handle form submission
-  const onFormSubmit = (e) => {
-    e.preventDefault(); // Prevents the page from reloading
-    // For now, we'll just log the data.
-    // Later, we will send this data to our backend API.
-    console.log('Registering user with:', formData);
-    alert('Registration form submitted! Check the console.');
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await api.post('/users/register', formData);
+      
+      // Save token and user data
+      setAuthToken(res.data.token);
+      setUser(res.data.user);
+      
+      // Redirect to home page
+      navigate('/home');
+    } catch (err) {
+      console.error('Registration error:', err);
+      if (err.code === 'ECONNREFUSED' || err.message === 'Network Error') {
+        setError('Cannot connect to server. Please make sure the backend server is running.');
+      } else if (err.response?.data?.msg) {
+        setError(err.response.data.msg);
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else {
+        setError(err.message || 'Registration failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +56,7 @@ const RegisterPage = () => {
       <div className="wrapper">
         <form onSubmit={onFormSubmit}>
           <h1>Register</h1>
+          {error && <div className="error-message">{error}</div>}
           <div className="input-box">
             <input
               type="text"
@@ -66,8 +91,8 @@ const RegisterPage = () => {
             />
             <i className='bx bxs-lock-alt'></i>
           </div>
-          <button type="submit" className="btn">
-            Register
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? 'Registering...' : 'Register'}
           </button>
           <div className="register-link">
             <p>
