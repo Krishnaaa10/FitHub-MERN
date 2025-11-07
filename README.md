@@ -15,17 +15,31 @@ FitHub is a complete MERN stack fitness application featuring modern UI/UX desig
 
 <img width="1920" height="1080" alt="Screenshot (66)" src="https://github.com/user-attachments/assets/44ee2fb7-aa35-421d-87e4-6d1f3edd784f" />
 
+---
+
 <img width="1920" height="1080" alt="Screenshot (67)" src="https://github.com/user-attachments/assets/db04a110-c5e6-477a-8e2f-3a1047e60974" />
+
+---
 
 <img width="1920" height="1080" alt="Screenshot (68)" src="https://github.com/user-attachments/assets/27981a9d-5710-417c-8b2e-003bf2f0f7c4" />
 
+---
+
 <img width="1920" height="1080" alt="Screenshot (69)" src="https://github.com/user-attachments/assets/65b45bc9-4b5a-45a9-abe5-9b3b59777a57" />
+
+---
 
 <img width="1920" height="1080" alt="Screenshot (70)" src="https://github.com/user-attachments/assets/4b2743c8-6bc4-43ba-a7ab-68055c547e8d" />
 
+---
+
 <img width="1920" height="1080" alt="Screenshot (71)" src="https://github.com/user-attachments/assets/0124f0b0-7585-498a-956a-ed8d1e65a514" />
 
+---
+
 <img width="1920" height="1080" alt="Screenshot (72)" src="https://github.com/user-attachments/assets/302cce73-ce06-4571-9f6e-87aa8536f69a" />
+
+---
 
 <img width="1920" height="1080" alt="Screenshot (73)" src="https://github.com/user-attachments/assets/f8d8ede8-ad80-46c2-88c4-84fadfe9833f" />
 
