@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
@@ -12,27 +14,32 @@ import CalendarPage from './pages/CalendarPage';
 import VideoPage from './pages/VideoPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import BookingPage from './pages/BookingPage';
 import './App.css';
+import './PerformanceOptimizations.css';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* --- Standalone pages WITHOUT the main navbar --- */}
-        <Route path="/" element={<RegisterPage />} />
+        {/* --- Landing Page (Entry Point) --- */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* --- Public routes --- */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/ekart" element={<EkartPage />} />
-        {/* --- THIS IS THE CRITICAL FIX: HomePage is now standalone --- */}
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/booking" element={<BookingPage />} />
 
+        {/* --- Protected routes --- */}
+        <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/ekart" element={<ProtectedRoute><EkartPage /></ProtectedRoute>} />
 
         {/* --- Pages that share a common Navbar (About, Contact, etc.) --- */}
         <Route element={<Layout />}>
-          <Route path="/subscription" element={<SubscriptionPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/calender" element={<CalendarPage />} />
-          <Route path="/video" element={<VideoPage />} />
+          <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+          <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+          <Route path="/calender" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+          <Route path="/video" element={<ProtectedRoute><VideoPage /></ProtectedRoute>} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>
