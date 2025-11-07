@@ -1,53 +1,97 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../SubscriptionPage.css'; // Import the new CSS
+import '../SubscriptionPage.css';
 
 const SubscriptionPage = () => {
+    const plans = [
+        {
+            id: 1,
+            name: 'SILVER',
+            price: '199',
+            period: '1 Month',
+            badge: null,
+            features: [
+                'Unlimited Video access',
+                'Nutritional Guidance',
+                'Group trainer',
+                'Personalized Plans',
+                'Weekly Check-ins'
+            ],
+            popular: false
+        },
+        {
+            id: 2,
+            name: 'GOLD',
+            price: '399',
+            period: '3 Months',
+            badge: 'Most Popular',
+            features: [
+                'Priority Booking',
+                'One time access to Clubs',
+                'Discuss fitness goals',
+                'Private Community',
+                'Renewal Discounts'
+            ],
+            popular: true
+        },
+        {
+            id: 3,
+            name: 'ELITE',
+            price: '599',
+            period: '6 Months',
+            badge: 'Best Value',
+            features: [
+                'VIP Access',
+                'Access to yoga area',
+                'Dedicated Support',
+                'Custom Rewards',
+                'Premium Events'
+            ],
+            popular: false
+        }
+    ];
+
     return (
         <div className="subscription-page">
-            <h1 className="subscription-header">FitPass</h1>
-            <div className="membership-grid">
-                {/* SILVER CARD */}
-                <div className="membership-card">
-                    <h4>SILVER</h4>
-                    <h2><sup>₹</sup>199</h2>
-                    <h3>For 1 Month</h3>
-                    <p>Unlimited Video access</p>
-                    <p>Nutritional Guidance</p>
-                    <p>Group trainer</p>
-                    <p>Personalized Plans</p>
-                    <p>Weekly Check-ins</p>
-                    <button className="btn membership-btn">
-                        <Link to="/payment">GET STARTED</Link>
-                    </button>
-                </div>
-                {/* GOLD CARD */}
-                <div className="membership-card">
-                    <h4>GOLD</h4>
-                    <h2><sup>₹</sup>399</h2>
-                    <h3>For 3 Months</h3>
-                    <p>Priority Booking</p>
-                    <p>One time access to Clubs</p>
-                    <p>Discuss fitness goals</p>
-                    <p>Private Community</p>
-                    <p>Renewal Discounts</p>
-                    <button className="btn membership-btn">
-                        <Link to="/payment">GET STARTED</Link>
-                    </button>
-                </div>
-                {/* ELITE CARD */}
-                <div className="membership-card">
-                    <h4>ELITE</h4>
-                    <h2><sup>₹</sup>599</h2>
-                    <h3>For 6 Months</h3>
-                    <p>VIP Access</p>
-                    <p>Access to yoga area</p>
-                    <p>Dedicated Support</p>
-                    <p>Custom Rewards</p>
-                    <p>Premium Events</p>
-                    <button className="btn membership-btn">
-                        <Link to="/payment">GET STARTED</Link>
-                    </button>
+            <div className="subscription-container">
+                <header className="subscription-header">
+                    <h1 className="subscription-title">FitPass</h1>
+                    <p className="subscription-subtitle">Choose the perfect plan for your fitness journey</p>
+                </header>
+
+                <div className="membership-grid">
+                    {plans.map((plan) => (
+                        <div 
+                            key={plan.id} 
+                            className={`membership-card ${plan.popular ? 'featured' : ''}`}
+                        >
+                            {plan.badge && (
+                                <div className="membership-badge">{plan.badge}</div>
+                            )}
+                            <div className="membership-header">
+                                <h4 className="membership-tier">{plan.name}</h4>
+                                <div className="membership-price-wrapper">
+                                    <span className="membership-currency">₹</span>
+                                    <span className="membership-price">{plan.price}</span>
+                                </div>
+                                <p className="membership-period">{plan.period}</p>
+                            </div>
+                            <div className="membership-features">
+                                <ul className="features-list">
+                                    {plan.features.map((feature, index) => (
+                                        <li key={index} className="feature-item">
+                                            <span className="feature-icon">✓</span>
+                                            <span className="feature-text">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <Link to="/payment" className="membership-button">
+                                <span>Get Started</span>
+                                <span className="button-arrow">→</span>
+                            </Link>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

@@ -1,82 +1,285 @@
-/* --- PROFESSIONAL SUBSCRIPTION PAGE STYLES --- */
+/* Modern Subscription Page Styles */
 .subscription-page {
-    font-family: 'Poppins', sans-serif;
-    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1549060279-7e168fcee0c2');
-    background-size: cover;
-    background-position: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
-    padding: 50px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    background: linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(20,20,20,0.88) 100%), 
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-position: center;
+    background-size: cover;
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    color: #fff;
+    padding: 100px 20px 60px;
+    position: relative;
+}
+
+.subscription-container {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .subscription-header {
-    font-size: 5rem;
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.subscription-title {
+    font-size: 4.5rem;
     font-weight: 900;
     color: orange;
-    text-align: center;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    text-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+    letter-spacing: -1px;
+}
+
+.subscription-subtitle {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
 }
 
 .membership-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-    max-width: 1200px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
 .membership-card {
-    background-color: rgba(20, 20, 20, 0.8);
-    border: 1px solid #333;
-    border-radius: 15px;
-    padding: 40px;
-    text-align: center;
-    color: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 40px 30px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .membership-card:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: 0 10px 30px rgba(255, 165, 0, 0.2);
+    transform: translateY(-10px) scale(1.02);
+    border-color: rgba(255, 165, 0, 0.5);
+    box-shadow: 0 25px 70px rgba(255, 165, 0, 0.3);
 }
 
-.membership-card h4 {
+.membership-card.featured {
+    border-color: orange;
+    background: linear-gradient(135deg, rgba(255, 165, 0, 0.15) 0%, rgba(255, 140, 0, 0.1) 100%);
+    transform: scale(1.05);
+}
+
+.membership-card.featured:hover {
+    transform: scale(1.08) translateY(-10px);
+}
+
+.membership-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: orange;
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 20px rgba(255, 165, 0, 0.4);
+}
+
+.membership-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.membership-tier {
     font-size: 1.2rem;
-    font-weight: 500;
-    color: #ccc;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
     margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.membership-card h2 {
-    font-size: 4rem;
+.membership-price-wrapper {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.membership-currency {
+    font-size: 1.8rem;
     font-weight: 700;
     color: orange;
-    margin: 10px 0;
 }
-.membership-card h2 sup { font-size: 2rem; }
-.membership-card h3 { font-size: 1rem; color: #888; margin-bottom: 30px; font-weight: 400;}
-.membership-card p { margin-bottom: 15px; color: #ddd; }
 
-.membership-btn {
-    background: orange;
-    color: black;
-    border: none;
-    padding: 15px 40px;
+.membership-price {
+    font-size: 4rem;
+    font-weight: 900;
+    color: orange;
+    line-height: 1;
+}
+
+.membership-period {
     font-size: 1rem;
-    font-weight: 700;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: transform 0.2s ease;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
 }
-.membership-btn:hover { transform: scale(1.05); }
-.membership-btn a { color: black !important; text-decoration: none !important; }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .membership-grid { grid-template-columns: 1fr; }
+.membership-features {
+    flex: 1;
+    margin-bottom: 30px;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-item:last-child {
+    border-bottom: none;
+}
+
+.feature-icon {
+    color: orange;
+    font-weight: 900;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.feature-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.membership-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 30px;
+    background: orange;
+    color: #000;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid orange;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.membership-button:hover {
+    background: #ff8c00;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 165, 0, 0.5);
+}
+
+.membership-card.featured .membership-button {
+    background: #000;
+    color: orange;
+    border-color: orange;
+}
+
+.membership-card.featured .membership-button:hover {
+    background: orange;
+    color: #000;
+}
+
+.button-arrow {
+    transition: transform 0.3s ease;
+}
+
+.membership-button:hover .button-arrow {
+    transform: translateX(5px);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .membership-card.featured {
+        transform: scale(1);
+    }
+
+    .membership-card.featured:hover {
+        transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .subscription-title {
+        font-size: 3rem;
+    }
+
+    .subscription-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .membership-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .membership-price {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-page {
+        padding: 80px 15px 40px;
+    }
+
+    .subscription-title {
+        font-size: 2.5rem;
+    }
+
+    .membership-card {
+        padding: 30px 20px;
+    }
+
+    .membership-price {
+        font-size: 2.5rem;
+    }
 }
