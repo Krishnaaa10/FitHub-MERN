@@ -1,12 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout, getUser } from '../utils/auth';
 import './Navbar.css';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const user = getUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
-    // This is the new outer container for the full-width background
     <div className="navbar-container">
-      {/* This inner container holds the centered content */}
       <div className="navbar-content">
         <div className="navbar-left">
           <div className="icon">
@@ -20,9 +27,32 @@ const Navbar = () => {
             </ul>
           </div>
         </div>
-        <div className="search-box">
-          <input type="text" placeholder="Search" />
-          <button type="submit">Search</button>
+        <div className="navbar-right">
+          {user && (
+            <div className="user-info" style={{ marginRight: '20px', color: 'white' }}>
+              Welcome, {user.name}
+            </div>
+          )}
+          <div className="search-box">
+            <input type="text" placeholder="Search" />
+            <button type="submit">Search</button>
+          </div>
+          {user && (
+            <button 
+              onClick={handleLogout} 
+              style={{ 
+                marginLeft: '10px', 
+                padding: '8px 16px', 
+                background: '#ff4444', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '4px', 
+                cursor: 'pointer' 
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </div>
