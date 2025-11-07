@@ -1,0 +1,259 @@
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS FOR 60-120 FPS
+   ============================================ */
+
+/* Enable hardware acceleration globally */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Smooth scrolling with GPU acceleration */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+}
+
+body {
+  /* GPU acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: scroll-position;
+  /* Reduce repaints */
+  contain: layout style paint;
+  /* Optimize font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimize all scrollable containers */
+* {
+  /* Use GPU for transforms */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Optimize backdrop-filter usage - only apply when needed */
+[class*="backdrop"] {
+  /* Use transform to create new stacking context */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Reduce blur intensity for better performance */
+  will-change: filter;
+  isolation: isolate;
+}
+
+/* Optimize fixed backgrounds - use transform instead of background-attachment */
+[style*="background-attachment: fixed"],
+.background-fixed {
+  /* Replace with transform-based solution */
+  background-attachment: scroll !important;
+  position: relative;
+}
+
+.background-fixed::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Optimize animations - use transform and opacity only */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Optimize cards and hover effects */
+.card,
+[class*="card"],
+[class*="Card"] {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Use contain for better performance */
+  contain: layout style paint;
+}
+
+/* Optimize hover effects - use transform only */
+[class*="hover"]:hover,
+a:hover,
+button:hover {
+  transform: translateZ(0) translateY(-2px);
+  will-change: transform;
+}
+
+/* Optimize images */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+  will-change: auto;
+  /* Lazy loading optimization */
+  content-visibility: auto;
+}
+
+/* Optimize sections */
+section {
+  contain: layout style paint;
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Reduce backdrop-filter blur intensity for better performance */
+.backdrop-blur-light {
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+.backdrop-blur-medium {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.backdrop-blur-heavy {
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+}
+
+/* Optimize scroll performance */
+.scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
+  will-change: scroll-position;
+  /* Use contain for scroll performance */
+  contain: layout style paint;
+}
+
+/* Optimize fixed elements */
+.fixed,
+[class*="fixed"],
+.navbar,
+header[class*="fixed"] {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Use contain for fixed elements */
+  contain: layout style paint;
+}
+
+/* Optimize transitions - prefer transform and opacity */
+* {
+  transition-property: transform, opacity, color, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable expensive transitions on scroll */
+.scrolling * {
+  transition: none !important;
+  animation-play-state: paused !important;
+}
+
+/* Optimize gradients - use simpler gradients */
+.gradient-simple {
+  background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.9) 100%) !important;
+}
+
+/* Reduce box-shadow complexity */
+.shadow-optimized {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Optimize text rendering */
+h1, h2, h3, h4, h5, h6, p, span, a {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Performance monitoring class */
+.performance-mode {
+  /* Reduce animations in performance mode */
+  animation-duration: 0.3s !important;
+  transition-duration: 0.2s !important;
+  /* Disable expensive effects */
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Optimize grid and flex layouts */
+.grid,
+.flex,
+[class*="grid"],
+[class*="flex"] {
+  contain: layout;
+  will-change: auto;
+}
+
+/* Optimize modals and overlays */
+.modal,
+.overlay,
+[class*="modal"],
+[class*="overlay"] {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce repaints on scroll */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-optimized {
+    contain: layout style paint;
+    transform: translateZ(0);
+  }
+}
+
+/* Optimize for high refresh rate displays */
+@media (min-resolution: 120dpi) {
+  * {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Disable expensive effects on low-end devices */
+@media (max-width: 768px) {
+  [class*="backdrop"] {
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+  }
+  
+  .background-fixed::before {
+    background-attachment: scroll !important;
+  }
+}
+
