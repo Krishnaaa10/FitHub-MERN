@@ -1,4 +1,4 @@
-# 💪 FitHub — Your Ultimate Fitness Oasis
+<img width="1920" height="1080" alt="Screenshot (73)" src="https://github.com/user-attachments/assets/059f0c02-9f74-4f22-8d81-8ea7b7a468f1" /># 💪 FitHub — Your Ultimate Fitness Oasis
 
 > A full-stack, modern, and high-performance fitness application designed to provide a seamless and immersive user experience. From tracking workouts to managing subscriptions and shopping for supplements — **FitHub** is your all-in-one digital fitness hub.
 
@@ -9,6 +9,25 @@
 ## 🎯 Project Overview
 
 FitHub is a complete MERN stack fitness application featuring modern UI/UX design, real-time workout tracking, exercise library, fitness store, subscription management, and comprehensive user authentication. Built with performance and user experience as top priorities.
+
+---
+## ✨ Screenshots
+
+<img width="1920" height="1080" alt="Screenshot (66)" src="https://github.com/user-attachments/assets/44ee2fb7-aa35-421d-87e4-6d1f3edd784f" />
+
+<img width="1920" height="1080" alt="Screenshot (67)" src="https://github.com/user-attachments/assets/db04a110-c5e6-477a-8e2f-3a1047e60974" />
+
+<img width="1920" height="1080" alt="Screenshot (68)" src="https://github.com/user-attachments/assets/27981a9d-5710-417c-8b2e-003bf2f0f7c4" />
+
+<img width="1920" height="1080" alt="Screenshot (69)" src="https://github.com/user-attachments/assets/65b45bc9-4b5a-45a9-abe5-9b3b59777a57" />
+
+<img width="1920" height="1080" alt="Screenshot (70)" src="https://github.com/user-attachments/assets/4b2743c8-6bc4-43ba-a7ab-68055c547e8d" />
+
+<img width="1920" height="1080" alt="Screenshot (71)" src="https://github.com/user-attachments/assets/0124f0b0-7585-498a-956a-ed8d1e65a514" />
+
+<img width="1920" height="1080" alt="Screenshot (72)" src="https://github.com/user-attachments/assets/302cce73-ce06-4571-9f6e-87aa8536f69a" />
+
+<img width="1920" height="1080" alt="Screenshot (73)" src="https://github.com/user-attachments/assets/f8d8ede8-ad80-46c2-88c4-84fadfe9833f" />
 
 ---
 
@@ -361,50 +380,6 @@ npm test       # Run tests
 
 ---
 
-## 🚀 Deployment
-
-### Backend Deployment (Render)
-
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Set build command: `cd backend && npm install`
-4. Set start command: `cd backend && npm start`
-5. Add environment variables in Render dashboard:
-   - `MONGO_URI`
-   - `JWT_SECRET`
-   - `NODE_ENV=production`
-   - `FRONTEND_URL` (your frontend URL)
-   - `PORT` (Render provides this automatically)
-
-### Frontend Deployment (Render)
-
-1. Create a new Static Site on Render
-2. Connect your GitHub repository
-3. Set build command: `cd frontend && npm install && npm run build`
-4. Set publish directory: `frontend/build`
-5. **IMPORTANT**: Add environment variable:
-   - `REACT_APP_API_URL=https://your-backend-url.onrender.com/api`
-6. Trigger a new deploy after setting the environment variable
-
-### Health Check
-
-Test your backend deployment:
-```
-https://your-backend-url.onrender.com/health
-```
-
-Should return:
-```json
-{
-  "status": "ok",
-  "message": "FitHub API is up and running!",
-  "timestamp": "...",
-  "environment": "production"
-}
-```
-
----
-
 ## 🛡️ Security Features
 
 - JWT-based authentication with secure token storage
@@ -414,78 +389,6 @@ Should return:
 - Environment variable protection
 - Secure email transmission
 - Input validation and sanitization
-
----
-
-## 🔧 Performance Optimizations
-
-FitHub is optimized for **60-120 FPS smooth scrolling**:
-
-- ✅ Removed expensive `background-attachment: fixed`
-- ✅ Optimized backdrop-filter blur
-- ✅ GPU acceleration with `transform: translateZ(0)`
-- ✅ Scroll performance optimizer JavaScript
-- ✅ Intersection Observer for efficient animations
-- ✅ Reduced repaints with CSS `contain` property
-- ✅ Passive event listeners for better scroll performance
-- ✅ Optimized animations (transform & opacity only)
-- ✅ Canvas-based particle animations (hardware accelerated)
-
----
-
-## 📧 Email System
-
-The contact form sends emails to the admin email address configured in `.env`.
-
-**Features:**
-- HTML-formatted emails
-- Professional design with FitHub branding
-- Includes sender name, email, subject, and message
-- Clickable reply-to links
-- Automatic email notifications
-
-**Test Email:**
-```bash
-cd backend
-node test-email.js
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Cannot Connect to Server Error
-
-**Issue**: Frontend shows "Cannot connect to server" error after deployment.
-
-**Solution**:
-1. Set `REACT_APP_API_URL` environment variable in Render frontend service
-2. Format: `https://your-backend-url.onrender.com/api`
-3. Trigger a new manual deploy after setting the variable
-4. Verify backend health check endpoint is accessible
-
-### Email Not Sending
-- Verify `EMAIL_USER` and `EMAIL_PASS` in `.env`
-- Ensure you're using an App Password, not regular password
-- Check backend server logs for errors
-- Test with `node test-email.js`
-
-### Database Connection Issues
-- Verify `MONGO_URI` in `.env`
-- Check MongoDB Atlas IP whitelist (add `0.0.0.0/0` for Render)
-- Ensure network connectivity
-- Check backend logs for connection errors
-
-### CORS Issues
-- Verify `FRONTEND_URL` is set correctly in backend `.env`
-- Check backend CORS configuration in `server.js`
-- Ensure frontend URL matches exactly (including protocol)
-
-### Performance Issues
-- Clear browser cache
-- Check browser DevTools Performance tab
-- Verify all optimizations are applied
-- Check network tab for slow API calls
 
 ---
 
@@ -542,28 +445,4 @@ FitHub — where fitness meets technology.
 
 ---
 
-## 🙏 Acknowledgments
-
-- Unsplash for background images
-- React community for excellent documentation
-- MongoDB Atlas for database hosting
-- Render for hosting services
-- All contributors and testers
-
----
-
-## 📊 Project Statistics
-
-- **Frontend**: React with modern CSS animations
-- **Backend**: Node.js/Express with MongoDB
-- **Total Pages**: 12+ pages
-- **Components**: 5+ reusable components
-- **API Endpoints**: 8+ endpoints
-- **Performance**: 60-120 FPS animations
-- **Responsive**: Mobile, Tablet, Desktop
-
----
-
 **Built with ❤️ and 💪**
-
-*Last Updated: 2024*
