@@ -10,6 +10,10 @@ const MessageSchemaByShri = new mongoose.Schema({
     type: String,
     required: true,
   },
+  subject: {
+    type: String,
+    default: 'Contact Form Submission',
+  },
   message: {
     type: String,
     required: true,
