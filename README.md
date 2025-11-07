@@ -6,23 +6,48 @@
 
 ---
 
-## ✨ Features & Functionality
+## 🎯 Project Overview
 
-FitHub is a **complete fitness ecosystem** built for modern fitness enthusiasts with a focus on performance and user experience.
+FitHub is a complete MERN stack fitness application featuring modern UI/UX design, real-time workout tracking, exercise library, fitness store, subscription management, and comprehensive user authentication. Built with performance and user experience as top priorities.
 
-### 🔐 Authentication & Security
-- JWT-based secure user authentication
-- Protected routes and session management
-- Password encryption with bcrypt
+---
 
-### 🏠 Dashboard & Home
-- Personalized greeting and workout suggestions
-- Today's workout recommendations (9 exercise library)
-- Featured programs with "coming soon" notifications
-- Quick access to Fitness Store
-- Smooth 60-120 FPS scrolling performance
+## ✨ Key Features
 
-### 🛒 E-commerce (Fitness Store)
+### 🔐 Modern Authentication System
+- **JWT-based secure authentication** with token management
+- **Dynamic login/register pages** with animated particle backgrounds
+- **Split-screen design** with glassmorphism effects
+- **Real-time backend health checks** and connection diagnostics
+- **Protected routes** with session management
+- **Password encryption** with bcrypt
+
+### 🏠 Redesigned Landing Page
+- **Modern, space-efficient design** with 80% content utilization
+- **Hero section** with gradient effects and CTAs
+- **Stats bar** displaying key metrics
+- **Training programs section** (Strength, Cardio, Yoga, Functional)
+- **Yoga practice section** with benefits and styles
+- **Features grid** showcasing app capabilities
+- **Fully responsive** design
+
+### 🎨 Modern UI/UX Design
+- **Animated particle backgrounds** with connecting lines
+- **Floating morphing shapes** with smooth animations
+- **Glassmorphism effects** throughout the application
+- **Smooth transitions** and hover effects
+- **Dynamic form inputs** with floating labels
+- **Orange/black color scheme** with gradient accents
+- **GPU-accelerated animations** for 60-120 FPS performance
+
+### 🏋️ Workout Management
+- **Interactive workout calendar** with date-based logging
+- **Quick log modal** for fast workout entry
+- **Exercise library** with video tutorials
+- **Progress tracking** and statistics
+- **Workout history** and streak tracking
+
+### 🛒 Fitness Store (E-commerce)
 - Modern product showcase with 8 premium supplements
 - Product categories: Protein, Performance, Recovery, Energy, Health, Equipment, Nutrition
 - Secure checkout integration
@@ -35,41 +60,20 @@ FitHub is a **complete fitness ecosystem** built for modern fitness enthusiasts 
 - Integrated payment processing
 - Feature comparison and benefits
 
-### 💰 Payment System
-- Secure checkout form
-- SSL encryption indicators
-- Multiple payment method support
-- Professional payment UI
-
-### 🗓️ Workout Calendar
-- Interactive workout scheduling
-- Track your training schedule
-- Visual calendar interface
-
-### ▶️ Video Library
-- 9 exercise tutorials with video playback
-- Bicep Curl, Barbell Squats, Bench Press, Cable Cross, Chest Fly, Seated Row, Pull-ups, Abs, Push-ups
-- Direct video navigation from workout suggestions
-- Modal-based video player
-
-### 📧 Contact System
-- Professional contact form
-- Email notifications to admin (krishnaspattel@gmail.com)
+### 📧 Contact & Communication
+- Professional contact form with validation
+- Email notifications to admin
 - HTML-formatted email templates
 - Message storage in database
-
-### 📄 About & Information
-- About Us page with mission and founder info
-- Core values display
-- Professional presentation
 
 ### ⚡ Performance Optimizations
 - 60-120 FPS smooth scrolling
 - GPU-accelerated animations
 - Optimized backdrop filters
-- Reduced background-attachment overhead
 - Scroll performance optimizer
 - Intersection Observer for efficient animations
+- Reduced repaints with CSS contain property
+- Passive event listeners
 
 ---
 
@@ -83,7 +87,7 @@ FitHub is a **complete fitness ecosystem** built for modern fitness enthusiasts 
 | **Authentication** | JWT (jsonwebtoken 9.0.2), bcryptjs 3.0.2 |
 | **Email** | Nodemailer 7.0.10 (Gmail SMTP) |
 | **API Communication** | Axios 1.7.2 |
-| **Styling** | CSS3 with Glassmorphism, Custom Animations |
+| **Styling** | CSS3 with Glassmorphism, Custom Animations, Canvas API |
 | **Dev Tools** | Nodemon 3.1.10, React Scripts 5.0.1 |
 
 ---
@@ -94,7 +98,7 @@ FitHub is a **complete fitness ecosystem** built for modern fitness enthusiasts 
 FitHub-MERN/
 ├── backend/                    # Node.js & Express.js Server
 │   ├── config/
-│   │   └── db.js              # MongoDB connection
+│   │   └── db.js              # MongoDB connection with error handling
 │   ├── middleware/
 │   │   └── auth.js            # JWT authentication middleware
 │   ├── models/
@@ -105,12 +109,13 @@ FitHub-MERN/
 │   ├── routes/
 │   │   └── api/
 │   │       ├── users.js       # User authentication routes
-│   │       ├── exercises.js   # Exercise routes
+│   │       ├── exercises.js   # Exercise routes (public)
 │   │       ├── workouts.js    # Workout routes
-│   │       └── contact.js    # Contact form & email routes
-│   ├── server.js              # Main server file
+│   │       └── contact.js     # Contact form & email routes
+│   ├── server.js              # Main server with CORS & health check
 │   ├── test-email.js          # Email configuration test script
 │   ├── .env                   # Environment variables (not in git)
+│   ├── env.example            # Environment variables template
 │   └── package.json
 │
 └── frontend/                   # React User Interface
@@ -125,22 +130,24 @@ FitHub-MERN/
         │   ├── QuickLogModal.js   # Workout logging modal
         │   └── Toast.js       # Toast notifications
         ├── pages/
-        │   ├── LandingPage.js     # Landing page
+        │   ├── LandingPage.js     # Modern landing page
         │   ├── HomePage.js        # Dashboard
-        │   ├── LoginPage.js      # Login
-        │   ├── RegisterPage.js   # Registration
-        │   ├── EkartPage.js      # Fitness Store
+        │   ├── LoginPage.js       # Dynamic login page
+        │   ├── RegisterPage.js    # Dynamic register page
+        │   ├── EkartPage.js       # Fitness Store
         │   ├── SubscriptionPage.js # FitPass
-        │   ├── PaymentPage.js    # Checkout
-        │   ├── VideoPage.js      # Exercise library
-        │   ├── CalendarPage.js   # Workout calendar
-        │   ├── AboutPage.js      # About us
-        │   ├── ContactPage.js    # Contact form
-        │   └── BookingPage.js    # Booking page
+        │   ├── PaymentPage.js     # Checkout
+        │   ├── VideoPage.js       # Exercise library
+        │   ├── CalendarPage.js    # Workout calendar
+        │   ├── AboutPage.js       # About us
+        │   ├── ContactPage.js     # Contact form
+        │   └── BookingPage.js     # Booking page
         ├── utils/
-        │   ├── api.js            # Axios configuration
+        │   ├── api.js            # Axios config with health check
         │   ├── auth.js           # Auth utilities
         │   └── scrollOptimizer.js # Scroll performance
+        ├── LandingPage.css       # Landing page styles
+        ├── AuthPages.css         # Auth pages styles
         ├── PerformanceOptimizations.css  # Performance CSS
         ├── App.js               # Main app component
         └── index.js             # Entry point
@@ -173,6 +180,18 @@ NODE_ENV=development
 # Email Configuration for Contact Form
 EMAIL_USER=your-gmail@gmail.com
 EMAIL_PASS=your-16-character-app-password
+```
+
+### Frontend (.env)
+
+Create a `.env` file inside `/frontend` directory:
+
+```env
+# Backend API URL
+REACT_APP_API_URL=http://localhost:5000/api
+
+# For production deployment on Render:
+# REACT_APP_API_URL=https://your-backend-url.onrender.com/api
 ```
 
 ### Email Setup
@@ -209,7 +228,7 @@ node test-email.js
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/FitHub-MERN.git
+   git clone https://github.com/Krishnaaa10/FitHub-MERN.git
    cd FitHub-MERN
    ```
 
@@ -226,6 +245,7 @@ node test-email.js
    ```
    
    Backend server will start on: **http://localhost:5000**
+   - Health check endpoint: `http://localhost:5000/health`
 
 3. **Frontend Setup**
    ```bash
@@ -278,9 +298,122 @@ npm test       # Run tests
 - **🖤 Dark Theme**: Sleek, modern, and athletic aesthetic
 - **✨ Smooth Animations**: GPU-accelerated, 60-120 FPS performance
 - **💎 Glassmorphism**: Modern backdrop blur effects (optimized)
+- **🎭 Dynamic Effects**: Animated particles, floating shapes, morphing backgrounds
 - **📱 Fully Responsive**: Mobile-first design approach
 - **♿ Accessible**: Optimized for screen readers and keyboard navigation
 - **⚡ Performance First**: Optimized for smooth scrolling and fast load times
+
+---
+
+## 🌟 Recent Updates
+
+### Version 2.0 - Modern Redesign
+
+#### Landing Page Redesign
+- ✅ Complete transformation with modern, space-efficient layout
+- ✅ Hero section with gradient effects
+- ✅ Stats bar with key metrics
+- ✅ Training programs showcase
+- ✅ Yoga practice section
+- ✅ Features grid
+- ✅ Improved navigation with larger fonts
+
+#### Authentication Pages Redesign
+- ✅ Dynamic login/register pages with animated particle backgrounds
+- ✅ Split-screen design with visual side and form side
+- ✅ Glassmorphism effects throughout
+- ✅ Floating morphing shapes
+- ✅ Animated form inputs with floating labels
+- ✅ Smooth transitions and hover effects
+- ✅ Canvas-based particle animations
+
+#### Backend Improvements
+- ✅ Enhanced CORS configuration for production deployment
+- ✅ Health check endpoint (`/health`) for deployment verification
+- ✅ Better error handling and logging
+- ✅ Improved environment variable documentation
+
+#### Frontend Improvements
+- ✅ Enhanced API error handling with diagnostics
+- ✅ Backend health check integration
+- ✅ Improved connection status display
+- ✅ Better error messages for users
+
+---
+
+## 📱 Pages & Routes
+
+### Public Routes
+- `/` - Landing Page (Modern redesign)
+- `/register` - User Registration (Dynamic design)
+- `/login` - User Login (Dynamic design)
+- `/booking` - Booking Available Soon page
+- `/about` - About Us page
+- `/contact` - Contact Us page
+
+### Protected Routes (Require Authentication)
+- `/home` - Dashboard/Home Page
+- `/ekart` - Fitness Store
+- `/subscription` - FitPass Subscription Plans
+- `/payment` - Checkout/Payment
+- `/video` - Exercise Video Library
+- `/calender` - Workout Calendar
+
+---
+
+## 🚀 Deployment
+
+### Backend Deployment (Render)
+
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Set build command: `cd backend && npm install`
+4. Set start command: `cd backend && npm start`
+5. Add environment variables in Render dashboard:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `NODE_ENV=production`
+   - `FRONTEND_URL` (your frontend URL)
+   - `PORT` (Render provides this automatically)
+
+### Frontend Deployment (Render)
+
+1. Create a new Static Site on Render
+2. Connect your GitHub repository
+3. Set build command: `cd frontend && npm install && npm run build`
+4. Set publish directory: `frontend/build`
+5. **IMPORTANT**: Add environment variable:
+   - `REACT_APP_API_URL=https://your-backend-url.onrender.com/api`
+6. Trigger a new deploy after setting the environment variable
+
+### Health Check
+
+Test your backend deployment:
+```
+https://your-backend-url.onrender.com/health
+```
+
+Should return:
+```json
+{
+  "status": "ok",
+  "message": "FitHub API is up and running!",
+  "timestamp": "...",
+  "environment": "production"
+}
+```
+
+---
+
+## 🛡️ Security Features
+
+- JWT-based authentication with secure token storage
+- Password hashing with bcrypt
+- Protected API routes with middleware
+- CORS configuration for production
+- Environment variable protection
+- Secure email transmission
+- Input validation and sanitization
 
 ---
 
@@ -289,13 +422,14 @@ npm test       # Run tests
 FitHub is optimized for **60-120 FPS smooth scrolling**:
 
 - ✅ Removed expensive `background-attachment: fixed`
-- ✅ Optimized backdrop-filter blur (reduced from 20-30px to 10px)
+- ✅ Optimized backdrop-filter blur
 - ✅ GPU acceleration with `transform: translateZ(0)`
 - ✅ Scroll performance optimizer JavaScript
 - ✅ Intersection Observer for efficient animations
 - ✅ Reduced repaints with CSS `contain` property
 - ✅ Passive event listeners for better scroll performance
 - ✅ Optimized animations (transform & opacity only)
+- ✅ Canvas-based particle animations (hardware accelerated)
 
 ---
 
@@ -318,78 +452,17 @@ node test-email.js
 
 ---
 
-## 🛡️ Security Features
-
-- JWT-based authentication
-- Password hashing with bcrypt
-- Protected API routes
-- CORS configuration
-- Environment variable protection
-- Secure email transmission
-
----
-
-## 📱 Pages & Routes
-
-### Public Routes
-- `/` - Landing Page
-- `/register` - User Registration
-- `/login` - User Login
-- `/booking` - Booking Available Soon page
-- `/about` - About Us page
-- `/contact` - Contact Us page
-
-### Protected Routes (Require Authentication)
-- `/home` - Dashboard/Home Page
-- `/ekart` - Fitness Store
-- `/subscription` - FitPass Subscription Plans
-- `/payment` - Checkout/Payment
-- `/video` - Exercise Video Library
-- `/calender` - Workout Calendar
-
----
-
-## 🚀 Features Breakdown
-
-### Landing Page
-- Hero section with CTA
-- Why FitHub section
-- Featured classes
-- Testimonials
-- Footer
-
-### Home Page (Dashboard)
-- Personalized greeting
-- Today's workout suggestion (from 9 exercises)
-- Featured programs
-- Quick access to Fitness Store
-- Motivational quotes
-
-### Fitness Store (Ekart)
-- 8 premium products
-- Product categories
-- Customer reviews
-- Why shop with us
-- Promotional banners
-
-### Subscription Page
-- 3 membership tiers
-- Feature comparison
-- Modern card design
-
-### Payment Page
-- Secure checkout form
-- SSL indicators
-- Multiple payment methods
-
-### Video Library
-- 9 exercise videos
-- Direct navigation from workout suggestions
-- Modal video player
-
----
-
 ## 🐛 Troubleshooting
+
+### Cannot Connect to Server Error
+
+**Issue**: Frontend shows "Cannot connect to server" error after deployment.
+
+**Solution**:
+1. Set `REACT_APP_API_URL` environment variable in Render frontend service
+2. Format: `https://your-backend-url.onrender.com/api`
+3. Trigger a new manual deploy after setting the variable
+4. Verify backend health check endpoint is accessible
 
 ### Email Not Sending
 - Verify `EMAIL_USER` and `EMAIL_PASS` in `.env`
@@ -399,13 +472,49 @@ node test-email.js
 
 ### Database Connection Issues
 - Verify `MONGO_URI` in `.env`
-- Check MongoDB Atlas IP whitelist
+- Check MongoDB Atlas IP whitelist (add `0.0.0.0/0` for Render)
 - Ensure network connectivity
+- Check backend logs for connection errors
+
+### CORS Issues
+- Verify `FRONTEND_URL` is set correctly in backend `.env`
+- Check backend CORS configuration in `server.js`
+- Ensure frontend URL matches exactly (including protocol)
 
 ### Performance Issues
 - Clear browser cache
 - Check browser DevTools Performance tab
 - Verify all optimizations are applied
+- Check network tab for slow API calls
+
+---
+
+## 📝 API Endpoints
+
+### Public Endpoints
+- `GET /health` - Health check endpoint
+- `GET /api/exercises` - Get all exercises
+- `POST /api/users/register` - Register new user
+- `POST /api/users/login` - Login user
+
+### Protected Endpoints (Require JWT Token)
+- `GET /api/workouts` - Get user's workout logs
+- `POST /api/workouts` - Create/update workout log
+- `DELETE /api/workouts/:date` - Delete workout log
+- `POST /api/contact` - Send contact form message
+
+---
+
+## 🎯 Future Enhancements
+
+- [ ] Social media integration
+- [ ] Workout sharing features
+- [ ] Advanced analytics and charts
+- [ ] Mobile app (React Native)
+- [ ] Real-time notifications
+- [ ] Community features
+- [ ] Personal trainer integration
+- [ ] Nutrition tracking
 
 ---
 
@@ -420,6 +529,7 @@ Licensed under the MIT License
 **Shrikrishna Patel**
 
 - Email: krishnaspattel@gmail.com
+- GitHub: [Krishnaaa10](https://github.com/Krishnaaa10)
 - Contact form available at `/contact`
 
 ---
@@ -437,8 +547,23 @@ FitHub — where fitness meets technology.
 - Unsplash for background images
 - React community for excellent documentation
 - MongoDB Atlas for database hosting
+- Render for hosting services
 - All contributors and testers
 
 ---
 
+## 📊 Project Statistics
+
+- **Frontend**: React with modern CSS animations
+- **Backend**: Node.js/Express with MongoDB
+- **Total Pages**: 12+ pages
+- **Components**: 5+ reusable components
+- **API Endpoints**: 8+ endpoints
+- **Performance**: 60-120 FPS animations
+- **Responsive**: Mobile, Tablet, Desktop
+
+---
+
 **Built with ❤️ and 💪**
+
+*Last Updated: 2024*
