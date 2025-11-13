@@ -130,17 +130,22 @@ const LoginPage = () => {
       navigate('/home');
     } catch (err) {
       console.error('Login error:', err);
-      if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-        const apiUrl = getApiUrl();
-        setError(`Cannot connect to server. Please make sure the backend server is running.`);
+      const apiUrl = getApiUrl();
+      
+      if (err.userMessage) {
+        setError(err.userMessage);
+      } else if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        setError(`Cannot connect to backend server at ${apiUrl}. Please check if the server is running and the API URL is configured correctly in environment variables.`);
       } else if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
-        setError('Request timeout. The server is taking too long to respond. Please try again.');
+        setError(`Request timeout. The server at ${apiUrl} is taking too long to respond. This might be due to a cold start on Render. Please try again.`);
       } else if (err.response?.data?.msg) {
         setError(err.response.data.msg);
       } else if (err.response?.status === 500) {
         setError('Server error. Please try again later.');
+      } else if (err.response?.status === 503) {
+        setError('Service temporarily unavailable. The database might be connecting. Please try again in a moment.');
       } else if (err.response?.status === 404) {
-        setError('API endpoint not found. Please check the backend server configuration.');
+        setError(`API endpoint not found at ${apiUrl}. Please check the backend server configuration.`);
       } else {
         setError(err.message || 'Login failed. Please check your credentials.');
       }
@@ -196,6 +201,10 @@ const LoginPage = () => {
             {backendStatus && !backendStatus.success && (
               <div className="auth-error-message">
                 ⚠️ Connection issue: {backendStatus.error || 'Cannot reach server'}
+                <br />
+                <small style={{ fontSize: '0.85em', opacity: 0.8 }}>
+                  Trying to connect to: {backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}
+                </small>
               </div>
             )}
 
