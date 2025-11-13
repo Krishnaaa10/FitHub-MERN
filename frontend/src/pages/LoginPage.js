@@ -199,12 +199,46 @@ const LoginPage = () => {
             </div>
 
             {backendStatus && !backendStatus.success && (
-              <div className="auth-error-message">
-                ⚠️ Connection issue: {backendStatus.error || 'Cannot reach server'}
-                <br />
-                <small style={{ fontSize: '0.85em', opacity: 0.8 }}>
-                  Trying to connect to: {backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}
-                </small>
+              <div className="auth-error-message" style={{ 
+                background: 'rgba(255, 193, 7, 0.15)',
+                border: '1px solid rgba(255, 193, 7, 0.4)',
+                color: '#ffc107',
+                padding: '20px',
+                borderRadius: '12px',
+                marginBottom: '25px'
+              }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '1.1rem' }}>
+                  ⚠️ Backend Connection Failed
+                </div>
+                <div style={{ fontSize: '0.9rem', marginBottom: '15px', opacity: 0.9 }}>
+                  Trying to connect to: <code style={{ 
+                    background: 'rgba(0,0,0,0.3)', 
+                    padding: '2px 6px', 
+                    borderRadius: '4px',
+                    fontSize: '0.85rem'
+                  }}>{backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}</code>
+                </div>
+                {window.location.hostname.includes('onrender.com') && (
+                  <div style={{ 
+                    background: 'rgba(0,0,0,0.2)', 
+                    padding: '15px', 
+                    borderRadius: '8px',
+                    marginTop: '15px',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.6'
+                  }}>
+                    <strong style={{ display: 'block', marginBottom: '8px' }}>🔧 Quick Fix (2 minutes):</strong>
+                    <ol style={{ margin: '0', paddingLeft: '20px', opacity: 0.95 }}>
+                      <li>Go to <strong>Render Dashboard</strong> → Your <strong>Frontend Service</strong></li>
+                      <li>Click <strong>Environment</strong> tab</li>
+                      <li>Add: <code>REACT_APP_API_URL</code> = <code>https://your-backend-url.onrender.com/api</code></li>
+                      <li>Click <strong>Manual Deploy</strong> → <strong>Deploy latest commit</strong></li>
+                    </ol>
+                    <div style={{ marginTop: '10px', fontSize: '0.8rem', opacity: 0.8 }}>
+                      💡 Get your backend URL from Render Dashboard → Backend Service
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
