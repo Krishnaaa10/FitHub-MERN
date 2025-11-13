@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Smart API URL detection
-const getApiUrl = () => {
+const detectApiUrl = () => {
   // First, check environment variable (highest priority)
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
@@ -50,7 +50,7 @@ const getApiUrl = () => {
   return 'http://localhost:5000/api';
 };
 
-const API_URL = getApiUrl();
+const API_URL = detectApiUrl();
 
 // Always log API URL for debugging (helps identify configuration issues)
 console.log('🔗 API Base URL:', API_URL);
