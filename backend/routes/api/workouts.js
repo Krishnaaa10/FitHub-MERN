@@ -1,6 +1,7 @@
 // API endpoints for workout calendar/logs
 const express = require('express');
 const router = express.Router();
+const { ensureConnection } = require('../../config/db');
 const auth = require('../../middleware/auth');
 const WorkoutLog = require('../../models/WorkoutLog');
 
@@ -9,6 +10,14 @@ const WorkoutLog = require('../../models/WorkoutLog');
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
+    }
+    
     const workoutLogs = await WorkoutLog.find({ user: req.user.id }).sort({ date: -1 });
     
     // Convert to object format for easier frontend consumption
@@ -19,8 +28,13 @@ router.get('/', auth, async (req, res) => {
     
     res.json(logsObject);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Get workouts error:', err);
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
+      return res.status(503).json({ 
+        msg: 'Database connection error. Please try again in a moment.' 
+      });
+    }
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -29,6 +43,14 @@ router.get('/', auth, async (req, res) => {
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
+    }
+    
     const { date, logs } = req.body;
 
     if (!date || !Array.isArray(logs)) {
@@ -54,11 +76,16 @@ router.post('/', auth, async (req, res) => {
 
     res.json(workoutLog);
   } catch (err) {
-    console.error(err.message);
+    console.error('Post workout error:', err);
     if (err.code === 11000) {
       return res.status(400).json({ msg: 'Workout log already exists for this date' });
     }
-    res.status(500).send('Server Error');
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
+      return res.status(503).json({ 
+        msg: 'Database connection error. Please try again in a moment.' 
+      });
+    }
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
@@ -67,6 +94,14 @@ router.post('/', auth, async (req, res) => {
 // @access  Private
 router.delete('/:date', auth, async (req, res) => {
   try {
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
+    }
+    
     const workoutLog = await WorkoutLog.findOneAndDelete({
       user: req.user.id,
       date: req.params.date,
@@ -78,8 +113,13 @@ router.delete('/:date', auth, async (req, res) => {
 
     res.json({ msg: 'Workout log deleted' });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Delete workout error:', err);
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
+      return res.status(503).json({ 
+        msg: 'Database connection error. Please try again in a moment.' 
+      });
+    }
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 

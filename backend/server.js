@@ -1,7 +1,7 @@
 // Main server entry point for the backend
 const express = require('express');
 const cors = require('cors'); // Import cors at the top
-const connectToMongoDatabase = require('./config/db');
+const { connectToMongoDatabase, closeConnection, isConnected } = require('./config/db');
 require('dotenv').config();
 
 // Initialize express app
@@ -52,17 +52,35 @@ shreeApp.use(cors({
 }));
 
 // 2. Enable express to parse JSON in request bodies
-shreeApp.use(express.json({ extended: false }));
+shreeApp.use(express.json({ extended: false, limit: '10mb' }));
+
+// 3. Request timeout middleware (30 seconds)
+shreeApp.use((req, res, next) => {
+  req.setTimeout(30000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({ msg: 'Request timeout' });
+    }
+  });
+  next();
+});
 
 // --- API Routes ---
 // Health check endpoint for deployment verification
-shreeApp.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    message: 'FitHub API is up and running!',
+shreeApp.get('/health', async (req, res) => {
+  const dbStatus = isConnected();
+  const healthStatus = {
+    status: dbStatus ? 'ok' : 'degraded',
+    message: dbStatus ? 'FitHub API is up and running!' : 'API is running but database connection is unavailable',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+      connected: dbStatus,
+      readyState: dbStatus ? 'connected' : 'disconnected'
+    }
+  };
+  
+  const statusCode = dbStatus ? 200 : 503;
+  res.status(statusCode).json(healthStatus);
 });
 
 // Simple test route
@@ -79,4 +97,48 @@ shreeApp.use('/api/workouts', require('./routes/api/workouts'));
 const PORT = process.env.PORT || 5000;
 
 // Start the server
-shreeApp.listen(PORT, () => console.log(`Backend server started on port ${PORT}`));
+const server = shreeApp.listen(PORT, () => {
+  console.log(`🚀 Backend server started on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📡 Health check: http://localhost:${PORT}/health`);
+});
+
+// Graceful shutdown handling
+const gracefulShutdown = async (signal) => {
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  
+  server.close(async () => {
+    console.log('✅ HTTP server closed');
+    
+    try {
+      await closeConnection();
+      console.log('✅ Graceful shutdown completed');
+      process.exit(0);
+    } catch (err) {
+      console.error('❌ Error during shutdown:', err);
+      process.exit(1);
+    }
+  });
+  
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    console.error('⚠️  Forcing shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+};
+
+// Handle shutdown signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+  gracefulShutdown('uncaughtException');
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled Rejection:', err);
+  // Don't exit on unhandled rejection, just log it
+});

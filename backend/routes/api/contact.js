@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const { ensureConnection } = require('../../config/db');
 require('dotenv').config();
 
 // Bring in the Message model we just created
@@ -34,18 +35,26 @@ router.post('/', async (req, res) => {
   const { name, email, subject, message } = req.body;
 
   try {
-    // Save to database if Message model exists
-    try {
-      const newMessage = new Message({
-        name,
-        email,
-        subject: subject || 'Contact Form Submission',
-        message,
-      });
-      await newMessage.save();
-    } catch (dbError) {
-      // If database save fails, log but continue with email
-      console.log('Database save skipped:', dbError.message);
+    // Ensure MongoDB connection before saving
+    const dbConnected = await ensureConnection();
+    
+    // Save to database if Message model exists and connection is available
+    if (dbConnected) {
+      try {
+        const newMessage = new Message({
+          name,
+          email,
+          subject: subject || 'Contact Form Submission',
+          message,
+        });
+        await newMessage.save();
+        console.log('✅ Message saved to database');
+      } catch (dbError) {
+        // If database save fails, log but continue with email
+        console.log('Database save skipped:', dbError.message);
+      }
+    } else {
+      console.log('⚠️  Database not connected, skipping database save');
     }
 
     // Send email notification
@@ -126,6 +135,16 @@ router.post('/', async (req, res) => {
     });
   } catch (err) {
     console.error('Contact form error:', err.message);
+    
+    // Handle database errors separately
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
+      // If it's just a database error but email might have been sent, return partial success
+      return res.status(503).json({ 
+        msg: 'Message may have been sent, but could not be saved to database. Please try again.',
+        error: 'Database connection error'
+      });
+    }
+    
     res.status(500).json({ 
       msg: 'Error processing your message. Please try again.',
       error: err.message 

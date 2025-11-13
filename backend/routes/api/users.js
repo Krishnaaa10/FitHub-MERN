@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+const { ensureConnection } = require('../../config/db');
 const auth = require('../../middleware/auth');
 const User = require('../../models/User');
 
@@ -23,23 +23,12 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ msg: 'Password must be at least 6 characters' });
     }
 
-    // Check MongoDB connection and reconnect if needed
-    if (mongoose.connection.readyState !== 1) {
-      console.log('MongoDB not connected, attempting to reconnect...');
-      try {
-        if (!process.env.MONGO_URI) {
-          return res.status(503).json({ 
-            msg: 'Database configuration missing. Please check backend/.env file.' 
-          });
-        }
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ Reconnected to MongoDB');
-      } catch (reconnectErr) {
-        console.error('Reconnection failed:', reconnectErr.message);
-        return res.status(503).json({ 
-          msg: 'Database connection unavailable. Please restart the backend server after updating MongoDB configuration.' 
-        });
-      }
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
     }
 
     // Check if user already exists
@@ -78,9 +67,9 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError') {
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
       return res.status(503).json({ 
-        msg: 'Database connection error. Please check your MongoDB configuration.' 
+        msg: 'Database connection error. Please try again in a moment.' 
       });
     }
     res.status(500).json({ msg: err.message || 'Server error' });
@@ -99,23 +88,12 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ msg: 'Please enter all fields' });
     }
 
-    // Check MongoDB connection and reconnect if needed
-    if (mongoose.connection.readyState !== 1) {
-      console.log('MongoDB not connected, attempting to reconnect...');
-      try {
-        if (!process.env.MONGO_URI) {
-          return res.status(503).json({ 
-            msg: 'Database configuration missing. Please check backend/.env file.' 
-          });
-        }
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ Reconnected to MongoDB');
-      } catch (reconnectErr) {
-        console.error('Reconnection failed:', reconnectErr.message);
-        return res.status(503).json({ 
-          msg: 'Database connection unavailable. Please restart the backend server after updating MongoDB configuration.' 
-        });
-      }
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
     }
     const user = await User.findOne({ email });
     if (!user) {
@@ -145,9 +123,9 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError') {
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
       return res.status(503).json({ 
-        msg: 'Database connection error. Please check your MongoDB configuration.' 
+        msg: 'Database connection error. Please try again in a moment.' 
       });
     }
     res.status(500).json({ msg: err.message || 'Server error' });
@@ -159,10 +137,26 @@ router.post('/login', async (req, res) => {
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
+    // Ensure MongoDB connection
+    const dbConnected = await ensureConnection();
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        msg: 'Database connection unavailable. Please try again in a moment.' 
+      });
+    }
+    
     const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
     res.json(user);
   } catch (err) {
-    console.error(err.message);
+    console.error('Get user error:', err);
+    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
+      return res.status(503).json({ 
+        msg: 'Database connection error. Please try again in a moment.' 
+      });
+    }
     res.status(500).json({ msg: 'Server error' });
   }
 });
