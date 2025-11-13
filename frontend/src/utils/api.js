@@ -1,14 +1,61 @@
 // API configuration and axios instance
 import axios from 'axios';
 
-// Get API URL from environment variable
-// In production, this should be set in Render's environment variables
-// Example: REACT_APP_API_URL=https://your-backend.onrender.com/api
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Smart API URL detection
+const getApiUrl = () => {
+  // First, check environment variable (highest priority)
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // In production, try to auto-detect backend URL
+  if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
+    const hostname = window.location.hostname;
+    
+    // If on Render, try common backend URL patterns
+    if (hostname.includes('onrender.com')) {
+      // Try to construct backend URL from frontend URL
+      // Example: frontend: fithub-frontend.onrender.com -> backend: fithub-backend.onrender.com
+      const frontendUrl = window.location.origin;
+      
+      // Common patterns to try
+      const possibleUrls = [
+        frontendUrl.replace('frontend', 'backend'),
+        frontendUrl.replace('fithub', 'fithub-backend'),
+        frontendUrl.replace('app', 'api'),
+        frontendUrl.replace('web', 'api'),
+        `https://${hostname.replace(/^[^-]+-/, '')}`, // Remove frontend prefix
+        `https://api-${hostname.split('.').slice(1).join('.')}`, // Add api- prefix
+      ];
+      
+      // Try the first reasonable pattern
+      for (const url of possibleUrls) {
+        if (url !== frontendUrl && url.includes('onrender.com')) {
+          console.log('🔍 Auto-detected possible backend URL:', `${url}/api`);
+          return `${url}/api`;
+        }
+      }
+      
+      // Fallback: ask user to set environment variable
+      console.error('⚠️ Could not auto-detect backend URL. Please set REACT_APP_API_URL environment variable in Render.');
+      console.error('📝 Current frontend URL:', frontendUrl);
+      console.error('💡 Set REACT_APP_API_URL to: https://your-backend-service.onrender.com/api');
+    }
+    
+    // For other production environments, try same domain with /api
+    return `${window.location.origin}/api`;
+  }
+  
+  // Development fallback
+  return 'http://localhost:5000/api';
+};
+
+const API_URL = getApiUrl();
 
 // Always log API URL for debugging (helps identify configuration issues)
 console.log('🔗 API Base URL:', API_URL);
 console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
+console.log('📍 Current URL:', window.location.origin);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -68,7 +115,7 @@ api.interceptors.response.use(
   }
 );
 
-// Export API URL for debugging
+// Export API URL getter function for debugging
 export const getApiUrl = () => API_URL;
 
 // Health check function to test backend connectivity
