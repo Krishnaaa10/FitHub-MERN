@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 let isConnected = false;
 let connectionAttempts = 0;
 let handlersSetup = false;
+let reconnectTimeout = null;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 const connectToMongoDatabase = async () => {
@@ -102,31 +103,44 @@ const setupConnectionHandlers = () => {
     isConnected = false;
     console.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
     
+    // Clear any existing reconnect timeout
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+    }
+    
     // Attempt to reconnect
-    if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
-      connectionAttempts++;
-      setTimeout(async () => {
+    const currentAttempts = connectionAttempts;
+    if (currentAttempts < MAX_RECONNECT_ATTEMPTS) {
+      connectionAttempts = currentAttempts + 1;
+      reconnectTimeout = setTimeout(async () => {
         try {
           if (!process.env.MONGO_URI) {
             console.error('❌ Cannot reconnect: MONGO_URI not configured');
             return;
           }
-          await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 30000,
-            socketTimeoutMS: 45000,
-            connectTimeoutMS: 30000,
-            maxPoolSize: 10,
-            minPoolSize: 2,
-            maxIdleTimeMS: 30000,
-            heartbeatFrequencyMS: 10000,
-            retryWrites: true,
-            retryReads: true,
-          });
-          console.log('✅ MongoDB reconnected successfully');
+          // Only reconnect if not already connected
+          if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+            await mongoose.connect(process.env.MONGO_URI, {
+              serverSelectionTimeoutMS: 30000,
+              socketTimeoutMS: 45000,
+              connectTimeoutMS: 30000,
+              maxPoolSize: 10,
+              minPoolSize: 2,
+              maxIdleTimeMS: 30000,
+              heartbeatFrequencyMS: 10000,
+              retryWrites: true,
+              retryReads: true,
+            });
+            console.log('✅ MongoDB reconnected successfully');
+            connectionAttempts = 0; // Reset on success
+          }
         } catch (reconnectErr) {
           console.error('❌ Reconnection failed:', reconnectErr.message);
         }
+        reconnectTimeout = null;
       }, 5000 * connectionAttempts);
+    } else {
+      console.error('⚠️  Max reconnection attempts reached. Manual intervention may be required.');
     }
   });
 
