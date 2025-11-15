@@ -1,0 +1,13 @@
+# Render configuration for frontend
+services:
+  - type: web
+    name: fithub-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run serve
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        sync: false  # Set this in Render dashboard
+
