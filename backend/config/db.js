@@ -56,13 +56,46 @@ const connectToMongoDatabase = async () => {
     
     console.error('❌ Failed to connect to MongoDB:', err.message);
     
-    if (err.message.includes('authentication failed') || err.code === 8000) {
+    if (err.message.includes('authentication failed') || err.code === 8000 || err.message.includes('bad auth')) {
       console.error('🔐 AUTHENTICATION ERROR:');
-      console.error('   - Check if database user exists in MongoDB Atlas');
-      console.error('   - Verify username and password are correct');
-      console.error('   - Make sure IP address is whitelisted (use 0.0.0.0/0 for Render)');
-      console.error('   - Go to: Database Access → Verify user exists');
-      console.error('   - Go to: Network Access → Whitelist your IP');
+      console.error('═══════════════════════════════════════════════════════════');
+      console.error('Your MONGO_URI has incorrect credentials!');
+      console.error('');
+      console.error('🔧 HOW TO FIX:');
+      console.error('');
+      console.error('1. Go to MongoDB Atlas: https://cloud.mongodb.com/');
+      console.error('2. Click on your cluster → "Connect" button');
+      console.error('3. Choose "Connect your application"');
+      console.error('4. Copy the connection string (looks like:)');
+      console.error('   mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/');
+      console.error('');
+      console.error('5. In Render Dashboard → Your Backend Service → Environment:');
+      console.error('   - Replace <username> with your MongoDB username');
+      console.error('   - Replace <password> with your MongoDB password');
+      console.error('   - Add your database name at the end: /fithub?retryWrites=true&w=majority');
+      console.error('');
+      console.error('6. Make sure:');
+      console.error('   ✓ Database user exists (Database Access → Users)');
+      console.error('   ✓ Password is correct (reset if needed)');
+      console.error('   ✓ Network Access allows 0.0.0.0/0 (for Render)');
+      console.error('');
+      console.error('📝 Example MONGO_URI format:');
+      console.error('   mongodb+srv://myuser:mypassword@cluster0.xxxxx.mongodb.net/fithub?retryWrites=true&w=majority');
+      console.error('═══════════════════════════════════════════════════════════');
+      
+      // Try to extract username from MONGO_URI for debugging (without password)
+      try {
+        const uri = process.env.MONGO_URI || '';
+        if (uri.includes('@')) {
+          const match = uri.match(/mongodb\+srv:\/\/([^:]+):/);
+          if (match) {
+            console.error(`💡 Detected username in URI: ${match[1]}`);
+            console.error('   Verify this username exists in MongoDB Atlas → Database Access');
+          }
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
     }
     
     // Retry connection if attempts haven't exceeded max
