@@ -18,10 +18,21 @@ const LoginPage = () => {
 
   useEffect(() => {
     const checkConnection = async () => {
+      const apiUrl = getApiUrl();
+      console.log('🔍 Checking backend connection...');
+      console.log('📍 Frontend URL:', window.location.origin);
+      console.log('🔗 API URL:', apiUrl);
+      console.log('🌍 Environment:', process.env.NODE_ENV);
+      console.log('⚙️ REACT_APP_API_URL set:', !!process.env.REACT_APP_API_URL);
+      
       const health = await checkBackendHealth();
       setBackendStatus(health);
       if (!health.success) {
-        console.error('Backend connection failed:', health);
+        console.error('❌ Backend connection failed:', health);
+        console.error('💡 To fix: Set REACT_APP_API_URL in Render environment variables');
+        console.error('💡 Example: REACT_APP_API_URL=https://your-backend.onrender.com/api');
+      } else {
+        console.log('✅ Backend connection successful!');
       }
     };
     checkConnection();
@@ -210,13 +221,15 @@ const LoginPage = () => {
                 <div style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '1.1rem' }}>
                   ⚠️ Backend Connection Failed
                 </div>
-                <div style={{ fontSize: '0.9rem', marginBottom: '15px', opacity: 0.9 }}>
-                  Trying to connect to: <code style={{ 
-                    background: 'rgba(0,0,0,0.3)', 
-                    padding: '2px 6px', 
-                    borderRadius: '4px',
-                    fontSize: '0.85rem'
-                  }}>{backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}</code>
+                <div style={{ fontSize: '0.9rem', marginBottom: '10px', opacity: 0.9 }}>
+                  <strong>Error:</strong> {backendStatus.error || 'Network Error'}
+                </div>
+                <div style={{ fontSize: '0.85rem', marginBottom: '15px', opacity: 0.8, fontFamily: 'monospace', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '4px' }}>
+                  <div><strong>Trying:</strong> {backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}</div>
+                  <div style={{ marginTop: '5px' }}><strong>API Base:</strong> {getApiUrl()}</div>
+                  <div style={{ marginTop: '5px', fontSize: '0.75rem', opacity: 0.7 }}>
+                    Env Var Set: {process.env.REACT_APP_API_URL ? '✅ Yes' : '❌ No'}
+                  </div>
                 </div>
                 {window.location.hostname.includes('onrender.com') && (
                   <div style={{ 
@@ -231,11 +244,25 @@ const LoginPage = () => {
                     <ol style={{ margin: '0', paddingLeft: '20px', opacity: 0.95 }}>
                       <li>Go to <strong>Render Dashboard</strong> → Your <strong>Frontend Service</strong></li>
                       <li>Click <strong>Environment</strong> tab</li>
-                      <li>Add: <code>REACT_APP_API_URL</code> = <code>https://your-backend-url.onrender.com/api</code></li>
+                      <li>Add: <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '3px' }}>REACT_APP_API_URL</code> = <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '3px' }}>https://your-backend-url.onrender.com/api</code></li>
                       <li>Click <strong>Manual Deploy</strong> → <strong>Deploy latest commit</strong></li>
                     </ol>
                     <div style={{ marginTop: '10px', fontSize: '0.8rem', opacity: 0.8 }}>
                       💡 Get your backend URL from Render Dashboard → Backend Service
+                    </div>
+                  </div>
+                )}
+                {window.location.hostname === 'localhost' && (
+                  <div style={{ 
+                    background: 'rgba(0,0,0,0.2)', 
+                    padding: '15px', 
+                    borderRadius: '8px',
+                    marginTop: '15px',
+                    fontSize: '0.85rem'
+                  }}>
+                    <strong>Local Development:</strong> Make sure your backend is running on port 5000
+                    <div style={{ marginTop: '5px', fontSize: '0.8rem', opacity: '0.8' }}>
+                      Run: <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px' }}>cd backend && npm start</code>
                     </div>
                   </div>
                 )}
