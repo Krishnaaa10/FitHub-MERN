@@ -17,9 +17,13 @@ let server = null;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'https://fithub-frontend-2hiw.onrender.com',
+  'http://fithub-frontend-2hiw.onrender.com',
   process.env.FRONTEND_URL,
-  // Add your Render frontend URL here or set FRONTEND_URL env variable
-].filter(Boolean); // Remove undefined values
+  process.env.FRONTEND_URL?.startsWith('http') ? 
+    process.env.FRONTEND_URL : 
+    `https://${process.env.FRONTEND_URL}`
+].filter(Boolean);
 
 // Simple CORS configuration for development
 shreeApp.use((req, res, next) => {
