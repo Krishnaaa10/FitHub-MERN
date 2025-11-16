@@ -21,35 +21,30 @@ const allowedOrigins = [
   // Add your Render frontend URL here or set FRONTEND_URL env variable
 ].filter(Boolean); // Remove undefined values
 
-// CORS configuration - Allow requests from frontend
-// For Render deployments, we allow all origins by default to avoid CORS issues
-// You can restrict this by setting FRONTEND_URL environment variable
-shreeApp.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // If FRONTEND_URL is set, use it to validate origins
-    if (process.env.FRONTEND_URL) {
-      const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, ''); // Remove trailing slash
-      if (origin === frontendUrl || origin.startsWith(frontendUrl)) {
-        return callback(null, true);
-      }
-      // Also check allowedOrigins array
-      if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
-        return callback(null, true);
-      }
+// Simple CORS configuration for development
+shreeApp.use((req, res, next) => {
+  // Allow all origins in development
+  if (process.env.NODE_ENV !== 'production') {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    // In production, only allow specific origins
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
     }
-    
-    // For Render deployments, allow all origins to avoid CORS issues
-    // In production without FRONTEND_URL set, allow all (Render-friendly)
-    // In development, always allow all
-    callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
 
 // 2. Enable express to parse JSON in request bodies
 shreeApp.use(express.json({ extended: false, limit: '10mb' }));
@@ -94,9 +89,10 @@ shreeApp.use('/api/workouts', require('./routes/api/workouts'));
 // (Add any other routes like ekart, subscriptions, etc., here)
 
 // 404 handler for undefined routes
-shreeApp.use((req, res) => {
+shreeApp.use('/api', (req, res) => {
   res.status(404).json({ 
-    msg: 'Route not found',
+    success: false,
+    msg: `API endpoint not found: ${req.method} ${req.path}`,
     path: req.path,
     method: req.method
   });
