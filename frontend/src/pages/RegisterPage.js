@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { checkBackendHealth, getApiUrl } from '../utils/api';
 import { setAuthToken, setUser } from '../utils/auth';
+import GoogleLoginButton from '../components/auth/GoogleLoginButton';
 import './AuthPages.css';
 
 const RegisterPage = () => {
@@ -14,6 +15,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [backendStatus, setBackendStatus] = useState(null);
   const [focusedField, setFocusedField] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
@@ -125,7 +127,7 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      const res = await api.post('/users/register', formData);
+      const res = await api.post('/api/users/register', formData);
       setAuthToken(res.data.token);
       setUser(res.data.user);
       navigate('/home');
@@ -148,6 +150,30 @@ const RegisterPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setGoogleLoading(true);
+      setError('');
+      
+      const response = await api.post('/api/users/google-login', {
+        token: credentialResponse.credential
+      });
+      
+      setAuthToken(response.data.token);
+      setUser(response.data.user);
+      navigate('/home');
+    } catch (err) {
+      console.error('Google signup error:', err);
+      setError(err.response?.data?.message || 'Failed to sign up with Google. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google signup was unsuccessful. Please try again or use another method.');
   };
 
   return (
@@ -173,6 +199,14 @@ const RegisterPage = () => {
               <div className="feature-item">
                 <div className="feature-icon">🎯</div>
                 <span>Set Goals</span>
+              </div>
+              <div className="feature-item">
+                <div className="feature-icon">📈</div>
+                <span>Track Progress</span>
+              </div>
+              <div className="feature-item">
+                <div className="feature-icon">🏆</div>
+                <span>Win Challenges</span>
               </div>
               <div className="feature-item">
                 <div className="feature-icon">📈</div>
@@ -272,6 +306,18 @@ const RegisterPage = () => {
                   'Create Account'
                 )}
               </button>
+
+              <div className="divider">OR</div>
+              
+              <div className="google-auth-section">
+                <GoogleLoginButton 
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  buttonText="Sign up with Google"
+                  disabled={loading || googleLoading}
+                />
+                {googleLoading && <div className="loading">Creating your account with Google...</div>}
+              </div>
             </form>
 
             <div className="auth-footer-links">

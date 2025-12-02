@@ -1,11 +1,20 @@
 // API configuration and axios instance
 import axios from 'axios';
 
+// Normalize a base URL to ensure it points at the API root (/api)
+const withApiSuffix = (base) => {
+  if (!base) return '';
+  // Avoid double /api/api
+  if (base.endsWith('/api')) return base;
+  return `${base.replace(/\/$/, '')}/api`;
+};
+
 // Smart API URL detection
 const detectApiUrl = () => {
   // First, check environment variable (highest priority)
   if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+    // Treat REACT_APP_API_URL as the backend base and normalize to /api
+    return withApiSuffix(process.env.REACT_APP_API_URL);
   }
   
   // In production, try to auto-detect backend URL
@@ -31,8 +40,9 @@ const detectApiUrl = () => {
       // Try the first reasonable pattern
       for (const url of possibleUrls) {
         if (url !== frontendUrl && url.includes('onrender.com')) {
-          console.log('🔍 Auto-detected possible backend URL:', `${url}/api`);
-          return `${url}/api`;
+          const apiUrl = withApiSuffix(url);
+          console.log('🔍 Auto-detected possible backend URL:', apiUrl);
+          return apiUrl;
         }
       }
       
@@ -43,11 +53,11 @@ const detectApiUrl = () => {
     }
     
     // For other production environments, try same domain with /api
-    return `${window.location.origin}/api`;
+    return withApiSuffix(window.location.origin);
   }
   
   // Development fallback
-  return 'http://localhost:5000/api';
+  return withApiSuffix('http://localhost:5000');
 };
 
 const API_URL = detectApiUrl();

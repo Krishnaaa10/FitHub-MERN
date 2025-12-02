@@ -1,22 +1,14 @@
 // API endpoints for workout calendar/logs
 const express = require('express');
 const router = express.Router();
-const { ensureConnection } = require('../../config/db');
-const auth = require('../../middleware/auth');
+const { protect } = require('../../middleware/auth');
 const WorkoutLog = require('../../models/WorkoutLog');
 
 // @route   GET api/workouts
 // @desc    Get all workout logs for authenticated user
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
     
     const workoutLogs = await WorkoutLog.find({ user: req.user.id }).sort({ date: -1 });
     
@@ -41,15 +33,8 @@ router.get('/', auth, async (req, res) => {
 // @route   POST api/workouts
 // @desc    Create or update workout log for a specific date
 // @access  Private
-router.post('/', auth, async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
     
     const { date, logs } = req.body;
 
@@ -92,15 +77,8 @@ router.post('/', auth, async (req, res) => {
 // @route   DELETE api/workouts/:date
 // @desc    Delete workout log for a specific date
 // @access  Private
-router.delete('/:date', auth, async (req, res) => {
+router.delete('/:date', protect, async (req, res) => {
   try {
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
     
     const workoutLog = await WorkoutLog.findOneAndDelete({
       user: req.user.id,

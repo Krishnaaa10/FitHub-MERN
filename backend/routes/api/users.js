@@ -1,163 +1,113 @@
-// API endpoints for user authentication (register, login)
+// API endpoints for user authentication (register, login, google login)
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { ensureConnection } = require('../../config/db');
 const auth = require('../../middleware/auth');
 const User = require('../../models/User');
 
-// @route   POST api/users/register
-// @desc    Register a new user
-// @access  Public
+// ---------------------------------------------
+// ✔ This import was missing — now added
+// ---------------------------------------------
+const { googleLogin } = require('../../controllers/authController');
+
+// ---------------------------------------------
+// ✔ GOOGLE LOGIN ROUTE (THE CRITICAL FIX)
+// ---------------------------------------------
+router.post('/google-login', googleLogin);
+
+// ---------------------------------------------
+// REGISTER USER
+// ---------------------------------------------
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
-      return res.status(400).json({ msg: 'Please enter all fields' });
+      return res.status(400).json({ success: false, msg: 'Please enter all fields' });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ msg: 'Password must be at least 6 characters' });
+      return res.status(400).json({ success: false, msg: 'Password must be at least 6 characters' });
     }
 
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
-
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ success: false, msg: 'User already exists' });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
+    const newUser = new User({ name, email, password });
     await newUser.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: newUser._id },
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production',
-      { expiresIn: '7d' }
-    );
+    const token = newUser.getSignedJwtToken();
 
     res.status(201).json({
+      success: true,
       token,
       user: {
         id: newUser._id,
         name: newUser.name,
-        email: newUser.email,
-      },
+        email: newUser.email
+      }
     });
   } catch (err) {
     console.error('Registration error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
-      return res.status(503).json({ 
-        msg: 'Database connection error. Please try again in a moment.' 
-      });
-    }
-    res.status(500).json({ msg: err.message || 'Server error' });
+    res.status(500).json({ success: false, msg: 'Server error' });
   }
 });
 
-// @route   POST api/users/login
-// @desc    Authenticate user & get token
-// @access  Public
+// ---------------------------------------------
+// LOGIN USER
+// ---------------------------------------------
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
-      return res.status(400).json({ msg: 'Please enter all fields' });
+      return res.status(400).json({ success: false, msg: 'Please provide email and password' });
     }
 
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(401).json({ success: false, msg: 'Invalid credentials' });
     }
 
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(401).json({ success: false, msg: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production',
-      { expiresIn: '7d' }
-    );
+    const token = user.getSignedJwtToken();
 
-    res.json({
+    res.status(200).json({
+      success: true,
       token,
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
-      },
+        email: user.email
+      }
     });
   } catch (err) {
     console.error('Login error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
-      return res.status(503).json({ 
-        msg: 'Database connection error. Please try again in a moment.' 
-      });
-    }
-    res.status(500).json({ msg: err.message || 'Server error' });
+    res.status(500).json({ success: false, msg: 'Server error' });
   }
 });
 
-// @route   GET api/users/me
-// @desc    Get current user profile
-// @access  Private
-router.get('/me', auth, async (req, res) => {
+// ---------------------------------------------
+// GET CURRENT USER
+// ---------------------------------------------
+router.get('/me', auth.protect, async (req, res) => {
   try {
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
-    
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+      return res.status(404).json({ success: false, msg: 'User not found' });
     }
-    res.json(user);
+
+    res.status(200).json({ success: true, data: user });
   } catch (err) {
     console.error('Get user error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
-      return res.status(503).json({ 
-        msg: 'Database connection error. Please try again in a moment.' 
-      });
-    }
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ success: false, msg: 'Server error' });
   }
 });
 

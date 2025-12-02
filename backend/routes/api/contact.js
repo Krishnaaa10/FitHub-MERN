@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const { ensureConnection } = require('../../config/db');
 require('dotenv').config();
 
 // Bring in the Message model we just created
@@ -34,27 +33,28 @@ router.post('/', async (req, res) => {
   // Get the data from the request body
   const { name, email, subject, message } = req.body;
 
+  // Input validation
+  if (!name || !email || !message) {
+    return res.status(400).json({
+      success: false,
+      msg: 'Please provide name, email, and message'
+    });
+  }
+
   try {
-    // Ensure MongoDB connection before saving
-    const dbConnected = await ensureConnection();
-    
-    // Save to database if Message model exists and connection is available
-    if (dbConnected) {
-      try {
-        const newMessage = new Message({
-          name,
-          email,
-          subject: subject || 'Contact Form Submission',
-          message,
-        });
-        await newMessage.save();
-        console.log('✅ Message saved to database');
-      } catch (dbError) {
-        // If database save fails, log but continue with email
-        console.log('Database save skipped:', dbError.message);
-      }
-    } else {
-      console.log('⚠️  Database not connected, skipping database save');
+    // Try to save to database
+    try {
+      const newMessage = new Message({
+        name,
+        email,
+        subject: subject || 'Contact Form Submission',
+        message,
+      });
+      await newMessage.save();
+      console.log('✅ Message saved to database');
+    } catch (dbError) {
+      // If database save fails, log but continue with email
+      console.log('Database save skipped:', dbError.message);
     }
 
     // Send email notification
@@ -130,24 +130,14 @@ router.post('/', async (req, res) => {
 
     // Send a success response back to the frontend
     res.status(200).json({ 
-      msg: 'Message received and sent successfully!',
-      success: true 
+      success: true,
+      msg: 'Message received and sent successfully!'
     });
   } catch (err) {
-    console.error('Contact form error:', err.message);
-    
-    // Handle database errors separately
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
-      // If it's just a database error but email might have been sent, return partial success
-      return res.status(503).json({ 
-        msg: 'Message may have been sent, but could not be saved to database. Please try again.',
-        error: 'Database connection error'
-      });
-    }
-    
-    res.status(500).json({ 
-      msg: 'Error processing your message. Please try again.',
-      error: err.message 
+    console.error('Contact form error:', err);
+    res.status(500).json({
+      success: false,
+      msg: 'Server error while processing your message'
     });
   }
 });

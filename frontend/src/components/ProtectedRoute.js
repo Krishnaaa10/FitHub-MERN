@@ -1,12 +1,15 @@
-// Protected Route Component
-import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../utils/auth';
+import { useSelector } from 'react-redux';
 
+// Protects routes by checking for an auth token in Redux.
+// Used as: <ProtectedRoute><SomePage /></ProtectedRoute>
 const ProtectedRoute = ({ children }) => {
-  if (!isAuthenticated()) {
+  const { token } = useSelector((state) => state.auth);
+
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
+
   return children;
 };
 

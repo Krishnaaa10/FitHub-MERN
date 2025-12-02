@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { checkBackendHealth, getApiUrl } from '../utils/api';
 import { setAuthToken, setUser } from '../utils/auth';
+import GoogleLoginButton from '../components/auth/GoogleLoginButton';
 import './AuthPages.css';
 
 const LoginPage = () => {
@@ -13,6 +14,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [backendStatus, setBackendStatus] = useState(null);
   const [focusedField, setFocusedField] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
@@ -135,7 +137,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await api.post('/users/login', formData);
+      const res = await api.post('/api/users/login', formData);
       setAuthToken(res.data.token);
       setUser(res.data.user);
       navigate('/home');
@@ -163,6 +165,30 @@ const LoginPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setGoogleLoading(true);
+      setError('');
+      
+      const response = await api.post('/api/users/google-login', {
+        token: credentialResponse.credential
+      });
+      
+      setAuthToken(response.data.token);
+      setUser(response.data.user);
+      navigate('/home');
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError(err.response?.data?.message || 'Failed to login with Google. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google login was unsuccessful. Please try again or use another method.');
   };
 
   return (
@@ -333,6 +359,17 @@ const LoginPage = () => {
                 </Link>
               </p>
             </div>
+
+            <div className="divider">OR</div>
+
+            <GoogleLoginButton 
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              buttonText="Continue with Google"
+              disabled={loading || googleLoading}
+            />
+
+            {googleLoading && <div className="loading">Signing in with Google...</div>}
           </div>
         </div>
       </div>

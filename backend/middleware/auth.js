@@ -1,51 +1,52 @@
-// Authentication middleware to verify JWT tokens
 const jwt = require('jsonwebtoken');
-const { ensureConnection } = require('../config/db');
 const User = require('../models/User');
+const ErrorResponse = require('../utils/errorResponse');
+const asyncHandler = require('./async');
 
-const auth = async (req, res, next) => {
+// Protect routes
+exports.protect = asyncHandler(async (req, res, next) => {
+  let token;
+
+  // Set token from Bearer token in header
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  // Set token from cookie
+  else if (req.cookies.token) {
+    token = req.cookies.token;
+  }
+
+  // Make sure token exists
+  if (!token) {
+    return next(new ErrorResponse('Not authorized to access this route', 401));
+  }
+
   try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({ msg: 'No token, authorization denied' });
-    }
-
     // Verify token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production');
-    } catch (jwtErr) {
-      return res.status(401).json({ msg: 'Token is not valid' });
-    }
-    
-    // Ensure MongoDB connection
-    const dbConnected = await ensureConnection();
-    if (!dbConnected) {
-      return res.status(503).json({ 
-        msg: 'Database connection unavailable. Please try again in a moment.' 
-      });
-    }
-    
-    // Get user from token
-    const user = await User.findById(decoded.id).select('-password');
-    if (!user) {
-      return res.status(401).json({ msg: 'Token is not valid' });
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = user;
+    req.user = await User.findById(decoded.id);
     next();
   } catch (err) {
-    console.error('Auth middleware error:', err);
-    if (err.name === 'MongoServerError' || err.name === 'MongoNetworkError' || err.name === 'MongooseError') {
-      return res.status(503).json({ 
-        msg: 'Database connection error. Please try again in a moment.' 
-      });
-    }
-    res.status(401).json({ msg: 'Token is not valid' });
+    return next(new ErrorResponse('Not authorized to access this route', 401));
   }
-};
+});
 
-module.exports = auth;
+// Grant access to specific roles
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `User role ${req.user.role} is not authorized to access this route`,
+          403
+        )
+      );
+    }
+    next();
+  };
+};
 

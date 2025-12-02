@@ -1,3 +1,6 @@
+:root {
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,6 +13,8 @@ body {
   -webkit-transform: translateZ(0);
   will-change: scroll-position;
   overflow-x: hidden;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 code {

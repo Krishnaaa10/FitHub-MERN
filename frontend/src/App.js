@@ -15,6 +15,7 @@ import VideoPage from './pages/VideoPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import BookingPage from './pages/BookingPage';
+import ProfilePage from './pages/ProfilePage';
 import './App.css';
 import './PerformanceOptimizations.css';
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
           <Route path="/calender" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
           <Route path="/video" element={<ProtectedRoute><VideoPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>

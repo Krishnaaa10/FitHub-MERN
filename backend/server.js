@@ -1,11 +1,30 @@
 // Main server entry point for the backend
 const express = require('express');
-const cors = require('cors'); // Import cors at the top
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
 const { connectToMongoDatabase, closeConnection, isConnected } = require('./config/db');
+const errorHandler = require('./middleware/error');
 require('dotenv').config();
 
 // Initialize express app
 const shreeApp = express();
+
+// Fix for 'Cannot set property query' error
+Object.defineProperty(require('express/lib/request'), 'query', {
+  configurable: true,
+  enumerable: true,
+  get() {
+    return this._query || {};
+  },
+  set(value) {
+    this._query = value;
+  }
+});
 
 // Store server reference for delayed start
 let server = null;
@@ -25,22 +44,17 @@ const allowedOrigins = [
     `https://${process.env.FRONTEND_URL}`
 ].filter(Boolean);
 
-// Simple CORS configuration for development
+// CORS configuration
 shreeApp.use((req, res, next) => {
-  // Allow all origins in development
-  if (process.env.NODE_ENV !== 'production') {
-    res.header('Access-Control-Allow-Origin', '*');
-  } else {
-    // In production, only allow specific origins
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin);
-    }
+  // Allow all origins in development, specific origins in production
+  const origin = req.headers.origin;
+  if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
   }
   
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -51,7 +65,32 @@ shreeApp.use((req, res, next) => {
 });
 
 // 2. Enable express to parse JSON in request bodies
-shreeApp.use(express.json({ extended: false, limit: '10mb' }));
+shreeApp.use(express.json({ limit: '10mb' }));
+
+// Parse URL-encoded bodies
+shreeApp.use(express.urlencoded({ extended: true }));
+
+// Cookie parser
+shreeApp.use(cookieParser());
+
+// Sanitize data
+shreeApp.use(mongoSanitize());
+
+// Set security headers
+shreeApp.use(helmet());
+
+// Prevent XSS attacks
+shreeApp.use(xss());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+shreeApp.use(limiter);
+
+// Prevent http param pollution
+shreeApp.use(hpp());
 
 // 3. Request timeout middleware (30 seconds)
 shreeApp.use((req, res, next) => {
@@ -85,12 +124,17 @@ shreeApp.get('/health', async (req, res) => {
 // Simple test route
 shreeApp.get('/', (req, res) => res.send('FitHub API is up and running!'));
 
-// Main API routes
+// Mount routers
+// Only use the auth routes from the auth.js file
 shreeApp.use('/api/users', require('./routes/api/users'));
+shreeApp.use('/api/auth', require('./routes/api/auth'));
 shreeApp.use('/api/exercises', require('./routes/api/exercises'));
 shreeApp.use('/api/contact', require('./routes/api/contact'));
 shreeApp.use('/api/workouts', require('./routes/api/workouts'));
 // (Add any other routes like ekart, subscriptions, etc., here)
+
+// Error handler (must be after all other middleware and routes)
+shreeApp.use(errorHandler);
 
 // 404 handler for undefined routes
 shreeApp.use('/api', (req, res) => {

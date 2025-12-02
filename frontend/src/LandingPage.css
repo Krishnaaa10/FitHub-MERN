@@ -39,9 +39,9 @@
 }
 
 .nav-container-new {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -113,11 +113,11 @@
 /* Hero Section */
 .hero-new {
   position: relative;
-  min-height: 90vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 140px 40px 80px;
+  padding: 120px 40px 60px;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
   overflow: hidden;
 }
@@ -232,7 +232,7 @@
   background: rgba(255, 140, 0, 0.05);
   border-top: 1px solid rgba(255, 140, 0, 0.1);
   border-bottom: 1px solid rgba(255, 140, 0, 0.1);
-  padding: 60px 0;
+  padding: 40px 0;
 }
 
 .stats-grid-new {
