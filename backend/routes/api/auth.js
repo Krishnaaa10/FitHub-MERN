@@ -1,15 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, googleLogin, getMe } = require('../../controllers/authController');
-const auth = require('../../middleware/auth');
+const {
+    register,
+    login,
+    googleLogin,
+    getMe,
+    forgotPassword,
+    resetPassword
+} = require('../../controllers/authController');
+const { protect } = require('../../middleware/auth');
 
-// Google Login Route
-// Matches frontend call to POST /api/auth/google
-router.post('/google', googleLogin);
-
-// Auth routes
+// Public Routes
 router.post('/register', register);
 router.post('/login', login);
-router.get('/me', auth.protect, getMe);
+router.post('/google', googleLogin);
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resettoken', resetPassword);
+
+// Protected Routes
+router.get('/me', protect, getMe);
 
 module.exports = router;

@@ -1,379 +1,147 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api, { checkBackendHealth, getApiUrl } from '../utils/api';
-import { setAuthToken, setUser } from '../utils/auth';
-import GoogleLoginButton from '../components/auth/GoogleLoginButton';
-import './AuthPages.css';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import {
+  TextField, Button, Divider, IconButton, Alert, Box, CircularProgress, Link, Typography
+} from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+import api from '../utils/api';
+import { setCredentials } from '../features/auth/authSlice';
+import AuthLayout from '../components/auth/AuthLayout';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [backendStatus, setBackendStatus] = useState(null);
-  const [focusedField, setFocusedField] = useState('');
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const canvasRef = useRef(null);
+  const [error, setError] = useState('');
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      const apiUrl = getApiUrl();
-      console.log('🔍 Checking backend connection...');
-      console.log('📍 Frontend URL:', window.location.origin);
-      console.log('🔗 API URL:', apiUrl);
-      console.log('🌍 Environment:', process.env.NODE_ENV);
-      console.log('⚙️ REACT_APP_API_URL set:', !!process.env.REACT_APP_API_URL);
-      
-      const health = await checkBackendHealth();
-      setBackendStatus(health);
-      if (!health.success) {
-        console.error('❌ Backend connection failed:', health);
-        console.error('💡 To fix: Set REACT_APP_API_URL in Render environment variables');
-        console.error('💡 Example: REACT_APP_API_URL=https://your-backend.onrender.com/api');
-      } else {
-        console.log('✅ Backend connection successful!');
-      }
-    };
-    checkConnection();
-  }, []);
-
-  // Animated background particles
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    const particleCount = 50;
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = Math.random() * 2 - 1;
-        this.speedY = Math.random() * 2 - 1;
-        this.opacity = Math.random() * 0.5 + 0.2;
-        this.color = `rgba(255, 140, 0, ${this.opacity})`;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
-      });
-
-      // Connect nearby particles
-      particles.forEach((particle, i) => {
-        particles.slice(i + 1).forEach((otherParticle) => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 150) {
-            ctx.strokeStyle = `rgba(255, 140, 0, ${0.2 * (1 - distance / 150)})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.stroke();
-          }
-        });
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const { email, password } = formData;
 
-  const onInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-  };
+  const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onFormSubmit = async (e) => {
+  // --- Standard Login ---
+  const onSubmit = async e => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
+    setError('');
     try {
-      const res = await api.post('/api/users/login', formData);
-      setAuthToken(res.data.token);
-      setUser(res.data.user);
-      navigate('/home');
+      const res = await api.post('/auth/login', formData);
+      dispatch(setCredentials({ user: res.data.user, token: res.data.token }));
+      navigate('/home'); // Redirect to dashboard/home
     } catch (err) {
-      console.error('Login error:', err);
-      const apiUrl = getApiUrl();
-      
-      if (err.userMessage) {
-        setError(err.userMessage);
-      } else if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-        setError(`Cannot connect to backend server at ${apiUrl}. Please check if the server is running and the API URL is configured correctly in environment variables.`);
-      } else if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
-        setError(`Request timeout. The server at ${apiUrl} is taking too long to respond. This might be due to a cold start on Render. Please try again.`);
-      } else if (err.response?.data?.msg) {
-        setError(err.response.data.msg);
-      } else if (err.response?.status === 500) {
-        setError('Server error. Please try again later.');
-      } else if (err.response?.status === 503) {
-        setError('Service temporarily unavailable. The database might be connecting. Please try again in a moment.');
-      } else if (err.response?.status === 404) {
-        setError(`API endpoint not found at ${apiUrl}. Please check the backend server configuration.`);
-      } else {
-        setError(err.message || 'Login failed. Please check your credentials.');
-      }
+      setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      setGoogleLoading(true);
-      setError('');
-      
-      const response = await api.post('/api/users/google-login', {
-        token: credentialResponse.credential
-      });
-      
-      setAuthToken(response.data.token);
-      setUser(response.data.user);
-      navigate('/home');
-    } catch (err) {
-      console.error('Google login error:', err);
-      setError(err.response?.data?.message || 'Failed to login with Google. Please try again.');
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
-  const handleGoogleError = () => {
-    setError('Google login was unsuccessful. Please try again or use another method.');
-  };
+  // --- Google Login ---
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      try {
+        // Exchange access token for JWT from backend
+        const res = await api.post('/auth/google', { token: tokenResponse.access_token });
+        dispatch(setCredentials({ user: res.data.user, token: res.data.token }));
+        navigate('/home');
+      } catch (err) {
+        setError(err.response?.data?.error || 'Google login failed.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => setError('Google Sign In failed'),
+  });
 
   return (
-    <div className="auth-page-modern">
-      <canvas ref={canvasRef} className="particles-canvas"></canvas>
-      
-      <div className="auth-split-container">
-        {/* Left Side - Visual/Info */}
-        <div className="auth-visual-side">
-          <div className="auth-visual-content">
-            <div className="floating-shapes">
-              <div className="shape shape-1"></div>
-              <div className="shape shape-2"></div>
-              <div className="shape shape-3"></div>
-            </div>
-            <h1 className="auth-visual-title">
-              Welcome <span className="gradient-text">Back</span>
-            </h1>
-            <p className="auth-visual-subtitle">
-              Continue your fitness journey and track your progress
-            </p>
-            <div className="auth-features">
-              <div className="feature-item">
-                <div className="feature-icon">💪</div>
-                <span>Track Workouts</span>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">📊</div>
-                <span>View Progress</span>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">🎯</div>
-                <span>Achieve Goals</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <AuthLayout title="Welcome Back" subtitle="Sign in to continue to FitHub">
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-        {/* Right Side - Form */}
-        <div className="auth-form-side">
-          <div className="auth-form-wrapper">
-            <div className="auth-form-header">
-              <h2 className="auth-form-title">Login</h2>
-              <p className="auth-form-subtitle">Sign in to your account</p>
-            </div>
+      <form onSubmit={onSubmit}>
+        <TextField
+          fullWidth
+          label="Email Address"
+          name="email"
+          type="email"
+          value={email}
+          onChange={onChange}
+          margin="normal"
+          variant="outlined"
+          required
+          sx={{ mb: 1, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+        />
+        <TextField
+          fullWidth
+          label="Password"
+          name="password"
+          type="password"
+          value={password}
+          onChange={onChange}
+          margin="normal"
+          variant="outlined"
+          required
+          sx={{ mb: 1, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+        />
 
-            {backendStatus && !backendStatus.success && (
-              <div className="auth-error-message" style={{ 
-                background: 'rgba(255, 193, 7, 0.15)',
-                border: '1px solid rgba(255, 193, 7, 0.4)',
-                color: '#ffc107',
-                padding: '20px',
-                borderRadius: '12px',
-                marginBottom: '25px'
-              }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '1.1rem' }}>
-                  ⚠️ Backend Connection Failed
-                </div>
-                <div style={{ fontSize: '0.9rem', marginBottom: '10px', opacity: 0.9 }}>
-                  <strong>Error:</strong> {backendStatus.error || 'Network Error'}
-                </div>
-                <div style={{ fontSize: '0.85rem', marginBottom: '15px', opacity: 0.8, fontFamily: 'monospace', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '4px' }}>
-                  <div><strong>Trying:</strong> {backendStatus.healthUrl || backendStatus.apiUrl || 'unknown'}</div>
-                  <div style={{ marginTop: '5px' }}><strong>API Base:</strong> {getApiUrl()}</div>
-                  <div style={{ marginTop: '5px', fontSize: '0.75rem', opacity: 0.7 }}>
-                    Env Var Set: {process.env.REACT_APP_API_URL ? '✅ Yes' : '❌ No'}
-                  </div>
-                </div>
-                {window.location.hostname.includes('onrender.com') && (
-                  <div style={{ 
-                    background: 'rgba(0,0,0,0.2)', 
-                    padding: '15px', 
-                    borderRadius: '8px',
-                    marginTop: '15px',
-                    fontSize: '0.85rem',
-                    lineHeight: '1.6'
-                  }}>
-                    <strong style={{ display: 'block', marginBottom: '8px' }}>🔧 Quick Fix (2 minutes):</strong>
-                    <ol style={{ margin: '0', paddingLeft: '20px', opacity: 0.95 }}>
-                      <li>Go to <strong>Render Dashboard</strong> → Your <strong>Frontend Service</strong></li>
-                      <li>Click <strong>Environment</strong> tab</li>
-                      <li>Add: <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '3px' }}>REACT_APP_API_URL</code> = <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '3px' }}>https://your-backend-url.onrender.com/api</code></li>
-                      <li>Click <strong>Manual Deploy</strong> → <strong>Deploy latest commit</strong></li>
-                    </ol>
-                    <div style={{ marginTop: '10px', fontSize: '0.8rem', opacity: 0.8 }}>
-                      💡 Get your backend URL from Render Dashboard → Backend Service
-                    </div>
-                  </div>
-                )}
-                {window.location.hostname === 'localhost' && (
-                  <div style={{ 
-                    background: 'rgba(0,0,0,0.2)', 
-                    padding: '15px', 
-                    borderRadius: '8px',
-                    marginTop: '15px',
-                    fontSize: '0.85rem'
-                  }}>
-                    <strong>Local Development:</strong> Make sure your backend is running on port 5000
-                    <div style={{ marginTop: '5px', fontSize: '0.8rem', opacity: '0.8' }}>
-                      Run: <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 4px' }}>cd backend && npm start</code>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mb: 3 }}>
+          <Link component={RouterLink} to="/forgot-password" underline="hover" sx={{ color: '#ff9800', fontWeight: 500 }}>
+            Forgot Password?
+          </Link>
+        </Box>
 
-            {error && (
-              <div className="auth-error-message animate-shake">
-                {error}
-              </div>
-            )}
+        <Button
+          fullWidth
+          variant="contained"
+          size="large"
+          type="submit"
+          disabled={loading}
+          sx={{
+            py: 1.8,
+            mb: 3,
+            borderRadius: '12px',
+            fontWeight: 800,
+            fontSize: '1rem',
+            textTransform: 'none',
+            background: 'linear-gradient(45deg, #FF9800 30%, #F57C00 90%)',
+            color: '#fff',
+            boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+            '&:hover': { background: 'linear-gradient(45deg, #F57C00 30%, #E65100 90%)' }
+          }}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Log In'}
+        </Button>
+      </form>
 
-            <form onSubmit={onFormSubmit} className="auth-form">
-              <div 
-                className={`auth-input-group ${focusedField === 'email' ? 'focused' : ''} ${email ? 'has-value' : ''}`}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField('')}
-              >
-                <label className="auth-input-label">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={email}
-                  onChange={onInputChange}
-                  className="auth-input"
-                  required
-                />
-                <div className="input-border"></div>
-              </div>
+      <Divider sx={{ my: 3, '&::before, &::after': { borderColor: '#333' } }}><Typography variant="caption" sx={{ color: '#666' }}>OR</Typography></Divider>
 
-              <div 
-                className={`auth-input-group ${focusedField === 'password' ? 'focused' : ''} ${password ? 'has-value' : ''}`}
-                onFocus={() => setFocusedField('password')}
-                onBlur={() => setFocusedField('')}
-              >
-                <label className="auth-input-label">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={password}
-                  onChange={onInputChange}
-                  className="auth-input"
-                  required
-                />
-                <div className="input-border"></div>
-              </div>
+      <Button
+        fullWidth
+        variant="outlined"
+        startIcon={<GoogleIcon />}
+        onClick={() => googleLogin()}
+        sx={{
+          py: 1.5,
+          borderRadius: '12px',
+          borderColor: '#333',
+          color: '#ccc',
+          textTransform: 'none',
+          fontWeight: 600,
+          fontSize: '1rem',
+          '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,0.05)', color: '#fff' }
+        }}
+      >
+        Sign in with Google
+      </Button>
 
-              <button 
-                type="submit" 
-                className={`auth-submit-btn ${loading ? 'loading' : ''}`}
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="btn-loader">
-                    <span></span><span></span><span></span>
-                  </span>
-                ) : (
-                  'Sign In'
-                )}
-              </button>
-            </form>
-
-            <div className="auth-footer-links">
-              <p>
-                Don't have an account?{' '}
-                <Link to="/register" className="auth-link">
-                  Create Account
-                </Link>
-              </p>
-            </div>
-
-            <div className="divider">OR</div>
-
-            <GoogleLoginButton 
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              buttonText="Continue with Google"
-              disabled={loading || googleLoading}
-            />
-
-            {googleLoading && <div className="loading">Signing in with Google...</div>}
-          </div>
-        </div>
-      </div>
-    </div>
+      <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Link component={RouterLink} to="/register" underline="hover" sx={{ color: '#fff', fontWeight: 500 }}>
+          Don't have an account? <span style={{ color: '#ff9800' }}>Sign Up</span>
+        </Link>
+      </Box>
+    </AuthLayout>
   );
 };
 

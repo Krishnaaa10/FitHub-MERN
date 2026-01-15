@@ -10,7 +10,7 @@ const LandingPage = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -27,7 +27,7 @@ const LandingPage = () => {
           <div className="nav-logo-new">
             <Link to="/">Fit<span>Hub</span></Link>
           </div>
-          
+
           <div className={`nav-links-new ${isMobileMenuOpen ? 'active' : ''}`}>
             <a href="#workouts" onClick={() => setIsMobileMenuOpen(false)}>Workouts</a>
             <a href="#yoga" onClick={() => setIsMobileMenuOpen(false)}>Yoga</a>
@@ -144,7 +144,7 @@ const LandingPage = () => {
             <div className="yoga-text-new">
               <h2 className="section-title-new">Yoga Practice</h2>
               <p className="yoga-description-new">
-                Find balance, flexibility, and inner peace through our comprehensive yoga programs. 
+                Find balance, flexibility, and inner peace through our comprehensive yoga programs.
                 Whether you're a beginner or advanced practitioner, we have sessions designed for your level.
               </p>
               <div className="yoga-benefits-new">
@@ -226,7 +226,6 @@ const LandingPage = () => {
             <p className="cta-description-new">Join FitHub today and get access to professional training resources</p>
             <div className="cta-buttons-new">
               <Link to="/register" className="btn-primary-new btn-large-new">Get Started</Link>
-              <Link to="/about" className="btn-secondary-new btn-large-new">Learn More</Link>
             </div>
           </div>
         </div>

@@ -7,6 +7,8 @@ import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import EkartPage from './pages/EkartPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import PaymentPage from './pages/PaymentPage';
@@ -29,6 +31,8 @@ function App() {
         {/* --- Public routes --- */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
         <Route path="/booking" element={<BookingPage />} />
 
         {/* --- Protected routes --- */}

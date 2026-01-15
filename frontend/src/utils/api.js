@@ -11,53 +11,11 @@ const withApiSuffix = (base) => {
 
 // Smart API URL detection
 const detectApiUrl = () => {
-  // First, check environment variable (highest priority)
   if (process.env.REACT_APP_API_URL) {
-    // Treat REACT_APP_API_URL as the backend base and normalize to /api
     return withApiSuffix(process.env.REACT_APP_API_URL);
   }
-  
-  // In production, try to auto-detect backend URL
-  if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
-    const hostname = window.location.hostname;
-    
-    // If on Render, try common backend URL patterns
-    if (hostname.includes('onrender.com')) {
-      // Try to construct backend URL from frontend URL
-      // Example: frontend: fithub-frontend.onrender.com -> backend: fithub-backend.onrender.com
-      const frontendUrl = window.location.origin;
-      
-      // Common patterns to try
-      const possibleUrls = [
-        frontendUrl.replace('frontend', 'backend'),
-        frontendUrl.replace('fithub', 'fithub-backend'),
-        frontendUrl.replace('app', 'api'),
-        frontendUrl.replace('web', 'api'),
-        `https://${hostname.replace(/^[^-]+-/, '')}`, // Remove frontend prefix
-        `https://api-${hostname.split('.').slice(1).join('.')}`, // Add api- prefix
-      ];
-      
-      // Try the first reasonable pattern
-      for (const url of possibleUrls) {
-        if (url !== frontendUrl && url.includes('onrender.com')) {
-          const apiUrl = withApiSuffix(url);
-          console.log('🔍 Auto-detected possible backend URL:', apiUrl);
-          return apiUrl;
-        }
-      }
-      
-      // Fallback: ask user to set environment variable
-      console.error('⚠️ Could not auto-detect backend URL. Please set REACT_APP_API_URL environment variable in Render.');
-      console.error('📝 Current frontend URL:', frontendUrl);
-      console.error('💡 Set REACT_APP_API_URL to: https://your-backend-service.onrender.com/api');
-    }
-    
-    // For other production environments, try same domain with /api
-    return withApiSuffix(window.location.origin);
-  }
-  
-  // Development fallback
-  return withApiSuffix('http://localhost:5000');
+  // Default to localhost for development
+  return 'http://localhost:5000/api';
 };
 
 const API_URL = detectApiUrl();
@@ -133,22 +91,22 @@ export const checkBackendHealth = async () => {
   try {
     // Get base URL (remove /api if present)
     let baseURL = API_URL.replace('/api', '').replace(/\/$/, ''); // Remove trailing slash too
-    
+
     // If API_URL is just localhost, try to construct proper URL
     if (baseURL.includes('localhost') && window.location.hostname !== 'localhost') {
       console.warn('⚠️ Using localhost API URL in production. Please set REACT_APP_API_URL environment variable.');
     }
-    
+
     const healthUrl = `${baseURL}/health`;
     console.log('🏥 Checking backend health at:', healthUrl);
-    
+
     const response = await axios.get(healthUrl, {
       timeout: 15000, // 15 second timeout for health check
       validateStatus: (status) => status < 500, // Accept 4xx as valid responses
     });
-    
-    return { 
-      success: response.status === 200, 
+
+    return {
+      success: response.status === 200,
       data: response.data,
       status: response.status,
       apiUrl: API_URL,
@@ -160,7 +118,7 @@ export const checkBackendHealth = async () => {
       code: error.code,
       apiUrl: API_URL,
     });
-    
+
     return {
       success: false,
       error: error.message || 'Network Error',
